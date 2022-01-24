@@ -17,8 +17,9 @@ final String baseUrl = 'http://$domain:$port';
 
 Future<HttpServer> createHttpServer() async {
   // creating db
-  final db = Db('mongodb://127.0.0.1:27017/test');
+  final db = Db('mongodb://127.0.0.1:27017/spa_server');
   await db.open();
+  print('connected to our database');
   final userStore = db.collection('users');
 
   // creating app which is basically the main router

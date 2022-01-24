@@ -33,9 +33,15 @@ doc/api/
 
 ### Dart Patch ###
 # dotenv environment variables file
-.env
+*.env
 
 # End of https://www.toptal.com/developers/gitignore/api/dart
 
 .vscode/
 .fvm/flutter_sdk
+
+# generated files
+
+*.g.dart
+*.freezed.dart
+*.part.dart

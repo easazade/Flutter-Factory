@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
 import 'package:shelf/shelf.dart';
 
 const corsHeaders = {
@@ -20,4 +24,19 @@ Middleware handleCors() {
       return response.change(headers: corsHeaders);
     },
   );
+}
+
+String generateSalt([int length = 32]) {
+  final random = Random();
+  final saltBytes = List<int>.generate(length, (index) => random.nextInt(256));
+  return base64Encode(saltBytes);
+}
+
+String hashPassword(String password, String salt) {
+  final codec = Utf8Codec();
+  final key = codec.encode(password);
+  final saltBytes = codec.encode(salt);
+  final hmac = Hmac(sha256, key);
+  final digest = hmac.convert(saltBytes);
+  return digest.toString();
 }

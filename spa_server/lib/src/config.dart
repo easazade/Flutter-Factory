@@ -4,8 +4,9 @@ part 'config.g.dart';
 
 @Envify(path: '.env')
 abstract class Env {
-  static const secretKey = _Env.secretKey;
-  static const mongoUrl = _Env.mongoUrl;
+  static const String secretKey = _Env.secretKey;
+  static const String mongoUrl = _Env.mongoUrl;
+  static const bool isDebugMode = _Env.isDebugMode;
 }
 
 

@@ -21,6 +21,19 @@ class AuthApi {
     router.post('/register', (Request request) async {
       // read user inputs
       final payload = await request.readAsString();
+      print('payload = $payload');
+      final params = request.params;
+      print('params = $params');
+      final url = request.url;
+      print('url = $url');
+      final requestedUri = request.requestedUri;
+      print('requestedUri = $requestedUri');
+      final context = request.context;
+      print('context = $context');
+      final headers = request.headers;
+      print('headers = $headers');
+      final mimType = request.mimeType;
+      print('mimType = $mimType');
       if (payload.isEmpty) {
         return createErrorResponse(statusCode: HttpStatus.badRequest, message: 'email and password is required');
       }
@@ -60,6 +73,44 @@ class AuthApi {
         final msg = 'there is already a user registered for this email $email';
         Logger.i(msg);
         return createErrorResponse(statusCode: HttpStatus.badRequest, message: msg);
+      }
+    });
+
+    router.post('/login', (Request request) async {
+      final payload = await request.readAsString();
+      print(payload);
+      final userInfo = jsonDecode(payload);
+      final email = userInfo['email'].toString().trim();
+      final password = userInfo['password'].toString().trim();
+
+      /// check user inputs
+      if (email.isNotSet) {
+        return createErrorResponse(statusCode: HttpStatus.badRequest, message: 'user email cannot be empty');
+      } else if (password.isNotSet) {
+        return createErrorResponse(statusCode: HttpStatus.badRequest, message: 'user password cannot be empty');
+      }
+
+      final user = await userStore.findOne(where.eq('email', email));
+      if (user == null) {
+        return createErrorResponse(
+          statusCode: HttpStatus.badRequest,
+          message: 'there is not user registered with this email',
+        );
+      } else {
+        final hasedPassword = hashPassword(password, user['salt']);
+        if (hasedPassword != user['password']) {
+          return createErrorResponse(statusCode: HttpStatus.forbidden, message: 'Incorrect email or password');
+        } else {
+          // if passwrod is correct we generate a JWT token
+          final userId = (user['_id'] as ObjectId).toHexString();
+          final token = generateJWT(userId, 'http://localhost', secret);
+          return createSuccessResponse(statusCode: HttpStatus.ok, message: 'you are logged in', data: {
+            'token': token,
+            'user': user
+              ..remove('password')
+              ..remove('salt'),
+          });
+        }
       }
     });
 

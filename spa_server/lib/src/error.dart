@@ -5,11 +5,13 @@ import 'package:shelf/shelf.dart';
 Response createSuccessResponse({
   int statusCode = 200,
   String message = 'success',
-  required dynamic data,
+  dynamic data,
 }) {
-  if (data is! List && data is! Map) {
-    print('some');
-    throw Exception('the data argument can only be a Map or List that can be serialized to json');
+  if (data != null) {
+    if (data is! List && data is! Map) {
+      print('some');
+      throw Exception('the data argument can only be a Map or List that can be serialized to json');
+    }
   }
   return Response(
     statusCode,
@@ -18,7 +20,7 @@ Response createSuccessResponse({
       {
         "statusCode": statusCode,
         "message": message,
-        "data": data,
+        if (data != null) "data": data,
       },
     ),
   );

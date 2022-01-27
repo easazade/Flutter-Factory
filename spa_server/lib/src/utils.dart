@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
@@ -45,3 +46,11 @@ JWT? verifyJWT(String token, String secret) {
     return null;
   }
 }
+
+Handler fallback(String pagePath) => (Request request) async {
+      final indexFile = File(pagePath).readAsStringSync();
+      return Response.ok(
+        indexFile,
+        headers: {'content-type': 'text/html'},
+      );
+    };

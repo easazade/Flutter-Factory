@@ -114,6 +114,18 @@ class AuthApi {
       }
     });
 
+    router.post('/logout', (Request request) async {
+      if (request.context['authDetails'] == null) {
+        return createErrorResponse(
+          statusCode: HttpStatus.forbidden,
+          message: 'you are not authorized to access',
+        );
+      }
+      //TODO: we should invalidate the token assigned to this user 
+      // otherwise logout does not work
+      return createSuccessResponse(message: 'Logged out successfully');
+    });
+
     return router;
   }
 }

@@ -3,8 +3,12 @@ import 'dart:developer' as dev;
 
 class Logger {
   static void e(dynamic anything) {
+    print('❌ $anything');
+  }
+
+  static void d(dynamic anything) {
     if (Env.isDebugMode) {
-      print('❌ $anything');
+      print('🐛 $anything');
     }
   }
 
@@ -16,7 +20,7 @@ class Logger {
 
   static void v(dynamic anything) {
     if (Env.isDebugMode) {
-      dev.log('📝 $anything');
+      dev.log('📜 $anything');
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:redis/redis.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
@@ -7,8 +8,10 @@ import 'package:shelf_static/shelf_static.dart';
 import 'package:spa_server/src/api/auth_api.dart';
 import 'package:spa_server/src/api/statics_files_api.dart';
 import 'package:spa_server/src/config.dart';
+import 'package:spa_server/src/log.dart';
 import 'package:spa_server/src/middlewares.dart';
 import 'package:spa_server/src/api/user_api.dart';
+import 'package:spa_server/src/token_service.dart';
 import 'package:spa_server/src/utils.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
@@ -22,8 +25,12 @@ Future<HttpServer> createHttpServer() async {
   // creating db
   final db = Db('mongodb://127.0.0.1:27017/spa_server');
   await db.open();
-  print('connected to our database');
+  Logger.i('connected to our database');
   final userStore = db.collection('users');
+  // token service
+  final tokenService = TokenService(db: RedisConnection(), secret: Env.secretKey);
+  await tokenService.start('localhost', 6379); // 6379 is default redis port
+  Logger.i('Token Service Running ...');
 
   // creating app which is basically the main router
   final app = Router();

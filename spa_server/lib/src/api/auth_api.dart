@@ -21,19 +21,19 @@ class AuthApi {
     router.post('/register', (Request request) async {
       // read user inputs
       final payload = await request.readAsString();
-      print('payload = $payload');
+      Logger.d('payload = $payload');
       final params = request.params;
-      print('params = $params');
+      Logger.d('params = $params');
       final url = request.url;
-      print('url = $url');
+      Logger.d('url = $url');
       final requestedUri = request.requestedUri;
-      print('requestedUri = $requestedUri');
+      Logger.d('requestedUri = $requestedUri');
       final context = request.context;
-      print('context = $context');
+      Logger.d('context = $context');
       final headers = request.headers;
-      print('headers = $headers');
+      Logger.d('headers = $headers');
       final mimType = request.mimeType;
-      print('mimType = $mimType');
+      Logger.d('mimType = $mimType');
       if (payload.isEmpty) {
         return createErrorResponse(statusCode: HttpStatus.badRequest, message: 'email and password is required');
       }

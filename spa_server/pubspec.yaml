@@ -15,6 +15,8 @@ dependencies:
   mongo_dart: ^0.7.4
   dart_jsonwebtoken: ^2.4.0
   envify: ^2.0.2
+  redis: ^2.2.0
+  uuid: ^3.0.5
   
 dev_dependencies:
   lints: ^1.0.0

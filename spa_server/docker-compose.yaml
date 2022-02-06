@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+
+# ro run this container run command $ docker-compose up -d      
+# if it is running it will be shown in docker app a container called spa_server

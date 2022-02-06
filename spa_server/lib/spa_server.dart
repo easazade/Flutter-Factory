@@ -35,7 +35,7 @@ Future<HttpServer> createHttpServer() async {
   // creating app which is basically the main router
   final app = Router();
 
-  app.mount('/auth', AuthApi(userStore: userStore, secret: Env.secretKey).router);
+  app.mount('/auth', AuthApi(userStore: userStore, secret: Env.secretKey, tokenService: tokenService).router);
 
   app.mount('/users', UsersApi(userStore: userStore).router);
 

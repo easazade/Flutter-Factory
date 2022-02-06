@@ -22,13 +22,20 @@ String hashPassword(String password, String salt) {
   return digest.toString();
 }
 
-String generateJWT(String subject, String issuer, String secret) {
+String generateJWT(
+  String subject,
+  String issuer,
+  String secret, {
+  required String jwtId,
+  Duration expiry = const Duration(seconds: 30),
+}) {
   final jwt = JWT(
     {'iat': DateTime.now().millisecondsSinceEpoch},
     subject: subject,
     issuer: issuer,
+    jwtId: jwtId,
   );
-  return jwt.sign(SecretKey(secret));
+  return jwt.sign(SecretKey(secret), expiresIn: expiry);
 }
 
 JWT? verifyJWT(String token, String secret) {
@@ -54,3 +61,17 @@ Handler fallback(String pagePath) => (Request request) async {
         headers: {'content-type': 'text/html'},
       );
     };
+
+class TokenPair {
+  final String idToken;
+  final String refreshToken;
+
+  TokenPair({required this.idToken, required this.refreshToken});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'token': idToken,
+      "refresh_token": refreshToken,
+    };
+  }
+}

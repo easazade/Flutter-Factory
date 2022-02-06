@@ -7,13 +7,19 @@ import 'package:shelf_router/shelf_router.dart';
 import 'package:spa_server/src/error.dart';
 import 'package:spa_server/src/extensions.dart';
 import 'package:spa_server/src/log.dart';
+import 'package:spa_server/src/token_service.dart';
 import 'package:spa_server/src/utils.dart';
 
 class AuthApi {
-  DbCollection userStore;
-  String secret;
+  AuthApi({
+    required this.userStore,
+    required this.secret,
+    required this.tokenService,
+  });
 
-  AuthApi({required this.userStore, required this.secret});
+  final DbCollection userStore;
+  final String secret;
+  final TokenService tokenService;
 
   Router get router {
     final router = Router();
@@ -103,13 +109,25 @@ class AuthApi {
         } else {
           // if passwrod is correct we generate a JWT token
           final userId = (user['_id'] as ObjectId).toHexString();
-          final token = generateJWT(userId, 'http://localhost', secret);
-          return createSuccessResponse(statusCode: HttpStatus.ok, message: 'you are logged in', data: {
-            'token': token,
-            'user': user
-              ..remove('password')
-              ..remove('salt'),
-          });
+          try {
+            final tokenPair = await tokenService.createToken(userId);
+            // final token = generateJWT(userId, 'http://localhost', secret);
+            return createSuccessResponse(
+              statusCode: HttpStatus.ok,
+              message: 'you are logged in',
+              data: {
+                'token': tokenPair,
+                'user': user
+                  ..remove('password')
+                  ..remove('salt'),
+              },
+            );
+          } on Exception catch (e, stacktrace) {
+            return createErrorResponse(
+              statusCode: HttpStatus.internalServerError,
+              message: 'Something went wrong, please try again',
+            );
+          }
         }
       }
     });
@@ -121,7 +139,7 @@ class AuthApi {
           message: 'you are not authorized to access',
         );
       }
-      //TODO: we should invalidate the token assigned to this user 
+      //TODO: we should invalidate the token assigned to this user
       // otherwise logout does not work
       return createSuccessResponse(message: 'Logged out successfully');
     });

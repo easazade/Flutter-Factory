@@ -7,3 +7,8 @@ services:
 
 # ro run this container run command $ docker-compose up -d      
 # if it is running it will be shown in docker app a container called spa_server
+
+# we can check our redis database with a redis client called redis-commander
+
+# to install redis-commander call command $ npm i -g redis-commander
+# to run it simply call redis-commander and then open it in browser with the link printed

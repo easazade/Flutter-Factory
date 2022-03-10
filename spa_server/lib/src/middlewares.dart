@@ -56,7 +56,7 @@ Middleware checkAuthorization() {
     requestHandler: (request) {
       if (request.context['authDetails'] == null) {
         return createErrorResponse(
-          statusCode: HttpStatus.forbidden,
+          statusCode: HttpStatus.unauthorized,
           message: 'Not Authorized to access this content',
         );
       }

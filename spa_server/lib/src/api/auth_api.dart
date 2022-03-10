@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
@@ -105,7 +106,7 @@ class AuthApi {
       } else {
         final hasedPassword = hashPassword(password, user['salt']);
         if (hasedPassword != user['password']) {
-          return createErrorResponse(statusCode: HttpStatus.forbidden, message: 'Incorrect email or password');
+          return createErrorResponse(statusCode: HttpStatus.unauthorized, message: 'Incorrect email or password');
         } else {
           // if passwrod is correct we generate a JWT token
           final userId = (user['_id'] as ObjectId).toHexString();
@@ -116,10 +117,10 @@ class AuthApi {
               statusCode: HttpStatus.ok,
               message: 'you are logged in',
               data: {
-                'token': tokenPair,
                 'user': user
                   ..remove('password')
                   ..remove('salt'),
+                'tokens': tokenPair,
               },
             );
           } on Exception catch (e, stacktrace) {
@@ -133,15 +134,57 @@ class AuthApi {
     });
 
     router.post('/logout', (Request request) async {
+      final auth = request.context['authDetails'];
+      Logger.d(auth);
+      final error = createErrorResponse(
+        statusCode: HttpStatus.unauthorized,
+        message: 'you are not authorized to access',
+      );
       if (request.context['authDetails'] == null) {
+        return error;
+      }
+      try {
+        await tokenService.removeRefreshToken((auth as JWT).jwtId!);
+      } catch (e, stacktrace) {
+        Logger.e(e);
+        Logger.e(stacktrace);
+        return error;
+      }
+      return createSuccessResponse(message: 'Logged out successfully');
+    });
+
+    router.post('/refresh', (Request request) async {
+      final payload = await request.readAsString();
+      final json = await jsonDecode(payload);
+
+      // checking if refresh token is still valid
+      final token = verifyJWT(json['refreshToken'], secret);
+      if (token == null) {
+        return createErrorResponse(statusCode: 400, message: 'refresh token is invalid');
+      }
+
+      final dbToken = await tokenService.getRefreshToken(token.jwtId!);
+      if (dbToken == null) {
         return createErrorResponse(
-          statusCode: HttpStatus.forbidden,
-          message: 'you are not authorized to access',
+          statusCode: 400,
+          message: 'Refresh token is not registered',
         );
       }
-      //TODO: we should invalidate the token assigned to this user
-      // otherwise logout does not work
-      return createSuccessResponse(message: 'Logged out successfully');
+
+      // generate new token pair
+      final JWT oldJwt = token;
+      try {
+        final tokenPair = await tokenService.createToken(oldJwt.subject!);
+        return createSuccessResponse(
+          statusCode: HttpStatus.ok,
+          message: 'tokens refreshed',
+          data: {
+            'tokens': tokenPair,
+          },
+        );
+      } catch (e, stacktrace) {
+        return createErrorResponse(statusCode: 500, message: 'Internal server error');
+      }
     });
 
     return router;

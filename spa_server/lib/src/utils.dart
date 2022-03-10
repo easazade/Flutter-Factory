@@ -70,7 +70,7 @@ class TokenPair {
 
   Map<String, dynamic> toJson() {
     return {
-      'token': idToken,
+      'access_token': idToken,
       "refresh_token": refreshToken,
     };
   }

@@ -1,12 +1,41 @@
 import 'dart:io';
 
+import 'package:mime/mime.dart';
+
+// this is the link of the tutorial https://www.youtube.com/watch?v=2NUL4YG6Wnk
+
 Future main(List<String> arguments) async {
+  final uploadDir = Directory('upload');
+  final images = <String>[];
+  await for (var fileEntity in uploadDir.list()) {
+    images.add(fileEntity.uri.path);
+  }
+  images.forEach(print);
+
   final server = await HttpServer.bind('localhost', 1234);
 
   await for (var request in server) {
-    request.response
-      ..headers.set('Content-Type', 'text/html')
-      ..write('''
+    final queryParams = request.uri.queryParameters;
+
+    final filePath = queryParams['file-to-download'];
+
+    if (filePath is String) {
+      print('trying to download $filePath');
+
+      final file = File(filePath);
+      if (await file.exists()) {
+        request.response.headers.set('Content-Type', lookupMimeType(filePath) ?? 'image/*');
+
+        final fileStream = file.openRead();
+        await request.response.addStream(fileStream);
+      }
+
+      await request.response.flush();
+      await request.response.close();
+    } else {
+      request.response
+        ..headers.set('Content-Type', 'text/html')
+        ..write('''
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,6 +49,7 @@ Future main(List<String> arguments) async {
     <form>
       <select name="file-to-download">
         <option selected>Choose Image</option>
+        <option> ${images.join('</option><option>')}</option>
       </select>
       <button>Download</button>
     </form>
@@ -28,7 +58,8 @@ Future main(List<String> arguments) async {
 
 ''');
 
-    await request.response.close();
+      await request.response.close();
+    }
   }
 }
 

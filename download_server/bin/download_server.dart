@@ -25,9 +25,15 @@ Future main(List<String> arguments) async {
       final file = File(filePath);
       if (await file.exists()) {
         request.response.headers.set('Content-Type', lookupMimeType(filePath) ?? 'image/*');
+        // to make this link downloadable instead of being opened and show we need to specify content-disposition
+        // as attachment instead of inline
+        final downloadName = filePath.split('/').last;
+        request.response.headers.set('Content-Disposition', 'attachment; filename="$downloadName"');
 
         final fileStream = file.openRead();
         await request.response.addStream(fileStream);
+      } else {
+        request.response.redirect(Uri(path: '/'));
       }
 
       await request.response.flush();
@@ -62,11 +68,6 @@ Future main(List<String> arguments) async {
     }
   }
 }
-
-
-
-
-
 
 // Future main(List<String> arguments) async {
 //   final server = await HttpServer.bind('localhost', 1234);

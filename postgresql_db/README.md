@@ -14,7 +14,6 @@ Visit [https://www.docker.com/products/docker-desktop](https://www.docker.com/pr
 ```bash
 docker-compose up -d
 ```
-
 ## Visit Adminer ui in the browser
 
 Visit [http://localhost:8082](http://localhost:8082) and log in with username `postgres` and password `password`.

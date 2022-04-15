@@ -33,6 +33,7 @@ Well, 6000.0 dollars, after taxes.
 the default and we should set `lenient: true` when creating a template. 
 - we can make a section of our template to be rendered by putting it in open close tags and set the value of the tag to true/false like `in_ca` tag.
 - mustache is **logic-less** because there are no if statements, else clauses, or for loops. Instead there are only tags. Some tags are replaced with a value, some nothing, and others a series of values. This document explains the different types of Mustache tags.
+- comments in mustache start witha bang -> `<h1>Today{{! ignore me }}.</h1>` which will render `<h1>Today.</h1>`. we can put new lines in comments if we need to 
 
 #### Variable tags
 
@@ -104,3 +105,77 @@ var t = new Template('{{# foo }}{{bar}}{{/ foo }}');
 var lambda = (LambdaContext ctx) => '<b>${ctx.renderString().toUpperCase()}</b>';
 t.renderString({'foo': lambda, 'bar': 'pub'}); // <b>PUB</b>
 ```
+
+- Non-False Values
+
+When the value is non-false but not a list, it will be used as the context for a single rendering of the block.
+
+Template:
+```mustache
+{{#person?}}
+  Hi {{name}}!
+{{/person?}}
+```
+Hash:
+```json
+{
+  "person?": { "name": "Jon" }
+}
+```
+Output:
+```text
+Hi Jon!
+```
+#### Inverted Sections
+
+this section tag is basically like an else clause for a section tag. if there is no key in context for the section tag key or the value in context for that key is false or empty list the inverted tag with the same key if there is any will be rendered.  
+
+Template:
+
+```mustache
+{{#repo}}
+  <b>{{name}}</b>
+{{/repo}}
+{{^repo}}
+  No repos :(
+{{/repo}}
+```
+Hash:
+```json
+{
+  "repo": []
+}
+```
+Output:
+```text
+No repos :(
+```
+
+#### Partials
+
+partials start with a greater than sign {{> user}}
+
+For example, this template and partial:
+
+base.mustache:
+```mustache
+<h2>Names</h2>
+{{#names}}
+  {{> user}}
+{{/names}}
+```
+user.mustache:
+```mustache
+<strong>{{name}}</strong>
+```
+Can be thought of as a single, expanded template:
+```mustache
+<h2>Names</h2>
+{{#names}}
+  <strong>{{name}}</strong>
+{{/names}}
+```
+
+#### Change Delimeters
+
+by default mustache uses `{{` `}}` and as delimeters 

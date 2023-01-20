@@ -9,7 +9,7 @@ Future main(List<String> arguments) async {
   await for (var request in server) {
     request.response.headers.set('Content-Type', 'text/html');
 
-    final content = await render('bin/templates/page.mustache', templateName: 'page', values: {
+    final content = await render('bin/templates/page.html', templateName: 'page', values: {
       'header': 'Mustache Dart',
       'optional': true,
     });

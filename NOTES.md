@@ -14,4 +14,4 @@ print(<Widget>{ // this is the syntax for a Set<Widget> literal
 ```
 to disable this in `debug-mode` use flag `--no-track-widget-creation` while running app
 
-- we can access all the objects that there are imported in `main.dart` entry point from dart console
+- we can access all the objects that there are imported in `main.dart` entry point from dart console just like javascript

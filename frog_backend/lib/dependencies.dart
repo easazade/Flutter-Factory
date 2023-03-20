@@ -25,12 +25,14 @@ class Dependency2 {
   Map<String, dynamic> toJson() => _$Dependency2ToJson(this);
 }
 
+Dependency1? _dependency1Cache;
+
 Middleware dependenciesProvider() {
   return (handler) {
     return (context) {
       context = context
           .provide<Future<Dependency2>>(() => Future.value(Dependency2('dependency 2')))
-          .provide<Dependency1>(() => Dependency1('dependency 1'));
+          .provide<Dependency1>(() => _dependency1Cache ??= Dependency1('dependency 1'));
 
       return handler(context);
     };

@@ -2,16 +2,19 @@
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:frog_backend/dependencies.dart';
+import 'package:frog_backend/extensions.dart';
 
-Response onRequest(RequestContext context, String id) {
+Future<Response> onRequest(RequestContext context, String id) async {
   print('accessing product with id $id');
 
-  final dependency = context.read<SomeDependency>();
+  final dependency = context.read<Dependency1>();
+  final dependency2 = await context.read<Future<Dependency2>>();
+
   return Response.json(
     body: {
       'id': id,
-      'product': 'some product name',
-      'dependency': dependency.name,
+      'product': 'Some product name',
+      'dependencies': [dependency, dependency2],
     },
   );
 }

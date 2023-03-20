@@ -15,15 +15,17 @@ import 'package:frog_backend/dependencies.dart';
 //   return handler.use(requestLogger());
 // }
 
-Handler middleware(Handler handler) {
+Handler middleware1(Handler handler) {
   return (context) async {
     print('before processing the request - our dear middleware');
-    context = context.provide(() => SomeDependency('important dependency'));
-    
 
     final response = await handler(context);
     print('after processing the request - our dear middleware');
 
     return response;
   };
+}
+
+Handler middleware(Handler handler) {
+  return handler.use(dependenciesProvider()).use(middleware1);
 }

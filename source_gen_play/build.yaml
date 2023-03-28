@@ -1,0 +1,25 @@
+targets:
+  $default:
+    builders:
+      source_gen_play:
+        enabled: true
+        generate_for:
+          exclude:
+            - test
+            - example
+          include:
+            - test/integration/*
+            - test/integration/**/*
+      source_gen|combining_builder:
+        options:
+          ignore_for_file:
+            - "type=lint"
+            
+
+builders:
+  source_gen_play:
+    import: "package:source_gen_play/builder.dart"
+    builder_factories: ["player"]
+    build_extensions: { ".dart": [".player.dart"] }
+    auto_apply: dependents
+    build_to: source

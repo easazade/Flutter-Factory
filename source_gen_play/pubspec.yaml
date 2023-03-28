@@ -1,0 +1,23 @@
+name: source_gen_play
+description: A sample command-line application.
+version: 1.0.0
+# repository: https://github.com/my_org/my_repo
+
+environment:
+  sdk: '>=2.19.2 <3.0.0'
+
+dependencies:
+  source_gen: ^1.2.7 
+  build: ^2.3.1
+  build_config: ^1.1.1
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.21.0
+  very_good_analysis: ^4.0.0
+  build_runner: ^2.3.3
+
+  # If you're only using source_gen in your own project
+  # to generate code and you won't publish your Generator for others to use, it can be a dev_dependency:
+
+  # source_gen: ^1.2.7 

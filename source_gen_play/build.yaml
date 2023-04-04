@@ -3,17 +3,15 @@ targets:
     builders:
       source_gen_play:
         enabled: true
+        # options:
+          # build_extensions:
+            # '^lib/models/{{}}.dart': 'lib/models/generated/{{}}.foo.dart'
         generate_for:
           exclude:
-            - test
-            - example
-          include:
-            - test/integration/*
-            - test/integration/**/*
-      source_gen|combining_builder:
-        options:
-          ignore_for_file:
-            - "type=lint"
+            - test/**
+            - example/**
+            - lib/**
+            - bin/**
             
 
 builders:
@@ -23,3 +21,4 @@ builders:
     build_extensions: { ".dart": [".player.dart"] }
     auto_apply: dependents
     build_to: source
+    

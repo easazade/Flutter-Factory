@@ -5,7 +5,8 @@ import 'package:postgresql_db/postgresql_db.dart' as postgresql_db;
 import 'package:postgres/postgres.dart';
 
 void main(List<String> arguments) async {
-  final connection = PostgreSQLConnection('localhost', 5432, 'postgres_dart', username: 'postgres', password: '1321');
+  final connection = PostgreSQLConnection('localhost', 5432, 'postgres_dart',
+      username: 'postgres', password: '1321');
   await connection.open();
   print('connected to postgres database');
 
@@ -43,7 +44,8 @@ void main(List<String> arguments) async {
   ''');
 
   // read data
-  final readResults = await connection.mappedResultsQuery('SELECT * FROM customers');
+  final readResults =
+      await connection.mappedResultsQuery('SELECT * FROM customers');
   print(readResults);
 
   // update data
@@ -53,8 +55,10 @@ void main(List<String> arguments) async {
   await connection.query('DELETE FROM customers WHERE id > 8');
 
   // insert our fake data into database
-  await _insertFakeCustomersInDatabase(connection, doAllInsertionsInOneTransaction: true);
-  await _insertFakeOrdersInDatabase(connection, doAllInsertionsInOneTransaction: true);
+  await _insertFakeCustomersInDatabase(connection,
+      doAllInsertionsInOneTransaction: true);
+  await _insertFakeOrdersInDatabase(connection,
+      doAllInsertionsInOneTransaction: true);
 
   // do a join query
   var joinResult = await connection.mappedResultsQuery('''

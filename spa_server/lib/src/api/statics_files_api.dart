@@ -16,7 +16,8 @@ class StaticAssetsApi {
   Router get router {
     final router = Router();
     router.get('/<file|.*>', (Request request) async {
-      final assetPath = path.join(assetsPath, request.requestedUri.path.substring(1));
+      final assetPath =
+          path.join(assetsPath, request.requestedUri.path.substring(1));
       return await createFileHandler(assetPath)(request);
     });
     return router;

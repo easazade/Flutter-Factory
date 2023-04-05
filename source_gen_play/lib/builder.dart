@@ -67,15 +67,20 @@ class SelectorInstantiationLocator extends RecursiveAstVisitor<void> {
     final className = node.methodName.name;
     var isSelectorInstantiation = className.startsWith(r'_$$');
     final classIndex = int.tryParse(className.substring(3));
-    isSelectorInstantiation = isSelectorInstantiation && (classIndex != null && classIndex >= 0);
+    isSelectorInstantiation =
+        isSelectorInstantiation && (classIndex != null && classIndex >= 0);
     // No target will exist for a constructor invocation.
-    isSelectorInstantiation = isSelectorInstantiation && node.realTarget == null;
+    isSelectorInstantiation =
+        isSelectorInstantiation && node.realTarget == null;
     // The selector instantiation should be done in an expression function body (=>).
-    isSelectorInstantiation = isSelectorInstantiation && node.parent is ExpressionFunctionBody;
+    isSelectorInstantiation =
+        isSelectorInstantiation && node.parent is ExpressionFunctionBody;
     // The function body should be part of a function expression (rather than a method declaration)
-    isSelectorInstantiation = isSelectorInstantiation && node.parent!.parent is FunctionExpression;
+    isSelectorInstantiation =
+        isSelectorInstantiation && node.parent!.parent is FunctionExpression;
     // The function expression should be inside an argument list.
-    isSelectorInstantiation = isSelectorInstantiation && node.parent!.parent!.parent is ArgumentList;
+    isSelectorInstantiation =
+        isSelectorInstantiation && node.parent!.parent!.parent is ArgumentList;
 
     if (isSelectorInstantiation) selectorInstantiations[className] = node;
 

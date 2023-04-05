@@ -10,9 +10,12 @@ void main(List<String> arguments) async {
   DbCollection peopleCollection = db.collection('people');
 
   // read people
-  var people = await peopleCollection.find(where.eq('first_name', 'Calypso')).toList();
+  var people =
+      await peopleCollection.find(where.eq('first_name', 'Calypso')).toList();
   people = await peopleCollection.find(where.match('first_name', 'B')).toList();
-  people = await peopleCollection.find(where.match('first_name', 'a').limit(3)).toList();
+  people = await peopleCollection
+      .find(where.match('first_name', 'a').limit(3))
+      .toList();
   if (people.isNotEmpty) {
     print('found ${people.length} entries');
     print(people);
@@ -70,12 +73,15 @@ void main(List<String> arguments) async {
     },
   );
 
-  print('updated person result ${await peopleCollection.findOne(where.eq('id', 101))}');
+  print(
+      'updated person result ${await peopleCollection.findOne(where.eq('id', 101))}');
 
   // remove item from collection
-  await peopleCollection.remove(await peopleCollection.findOne(where.eq('id', 101)));
+  await peopleCollection
+      .remove(await peopleCollection.findOne(where.eq('id', 101)));
 
-  print('is person deleted ??? OOOO, is this null??? ${await peopleCollection.findOne(where.eq('id', 101))}');
+  print(
+      'is person deleted ??? OOOO, is this null??? ${await peopleCollection.findOne(where.eq('id', 101))}');
   // we need to close db otherwise dart process won't exit
   await db.close();
 }

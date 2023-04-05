@@ -42,7 +42,9 @@ class AuthApi {
       final mimType = request.mimeType;
       Logger.d('mimType = $mimType');
       if (payload.isEmpty) {
-        return createErrorResponse(statusCode: HttpStatus.badRequest, message: 'email and password is required');
+        return createErrorResponse(
+            statusCode: HttpStatus.badRequest,
+            message: 'email and password is required');
       }
       final userInfo = jsonDecode(payload);
       final email = userInfo['email'].toString().trim();
@@ -50,9 +52,13 @@ class AuthApi {
 
       /// check user inputs
       if (email.isNotSet) {
-        return createErrorResponse(statusCode: HttpStatus.badRequest, message: 'user email cannot be empty');
+        return createErrorResponse(
+            statusCode: HttpStatus.badRequest,
+            message: 'user email cannot be empty');
       } else if (password.isNotSet) {
-        return createErrorResponse(statusCode: HttpStatus.badRequest, message: 'user password cannot be empty');
+        return createErrorResponse(
+            statusCode: HttpStatus.badRequest,
+            message: 'user password cannot be empty');
       }
 
       // check if user already registered
@@ -79,7 +85,8 @@ class AuthApi {
       } else {
         final msg = 'there is already a user registered for this email $email';
         Logger.i(msg);
-        return createErrorResponse(statusCode: HttpStatus.badRequest, message: msg);
+        return createErrorResponse(
+            statusCode: HttpStatus.badRequest, message: msg);
       }
     });
 
@@ -92,9 +99,13 @@ class AuthApi {
 
       /// check user inputs
       if (email.isNotSet) {
-        return createErrorResponse(statusCode: HttpStatus.badRequest, message: 'user email cannot be empty');
+        return createErrorResponse(
+            statusCode: HttpStatus.badRequest,
+            message: 'user email cannot be empty');
       } else if (password.isNotSet) {
-        return createErrorResponse(statusCode: HttpStatus.badRequest, message: 'user password cannot be empty');
+        return createErrorResponse(
+            statusCode: HttpStatus.badRequest,
+            message: 'user password cannot be empty');
       }
 
       final user = await userStore.findOne(where.eq('email', email));
@@ -106,7 +117,9 @@ class AuthApi {
       } else {
         final hasedPassword = hashPassword(password, user['salt']);
         if (hasedPassword != user['password']) {
-          return createErrorResponse(statusCode: HttpStatus.unauthorized, message: 'Incorrect email or password');
+          return createErrorResponse(
+              statusCode: HttpStatus.unauthorized,
+              message: 'Incorrect email or password');
         } else {
           // if passwrod is correct we generate a JWT token
           final userId = (user['_id'] as ObjectId).toHexString();
@@ -160,7 +173,8 @@ class AuthApi {
       // checking if refresh token is still valid
       final token = verifyJWT(json['refreshToken'], secret);
       if (token == null) {
-        return createErrorResponse(statusCode: 400, message: 'refresh token is invalid');
+        return createErrorResponse(
+            statusCode: 400, message: 'refresh token is invalid');
       }
 
       final dbToken = await tokenService.getRefreshToken(token.jwtId!);
@@ -183,7 +197,8 @@ class AuthApi {
           },
         );
       } catch (e, stacktrace) {
-        return createErrorResponse(statusCode: 500, message: 'Internal server error');
+        return createErrorResponse(
+            statusCode: 500, message: 'Internal server error');
       }
     });
 

@@ -28,14 +28,21 @@ Future<HttpServer> createHttpServer() async {
   Logger.i('connected to our database');
   final userStore = db.collection('users');
   // token service
-  final tokenService = TokenService(db: RedisConnection(), secret: Env.secretKey);
+  final tokenService =
+      TokenService(db: RedisConnection(), secret: Env.secretKey);
   await tokenService.start('localhost', 6379); // 6379 is default redis port
   Logger.i('Token Service Running ...');
 
   // creating app which is basically the main router
   final app = Router();
 
-  app.mount('/auth', AuthApi(userStore: userStore, secret: Env.secretKey, tokenService: tokenService).router);
+  app.mount(
+      '/auth',
+      AuthApi(
+              userStore: userStore,
+              secret: Env.secretKey,
+              tokenService: tokenService)
+          .router);
 
   app.mount('/users', UsersApi(userStore: userStore).router);
 

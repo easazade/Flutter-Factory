@@ -9,7 +9,8 @@ Response createSuccessResponse({
 }) {
   if (data != null) {
     if (data is! List && data is! Map) {
-      throw Exception('the data argument can only be a Map or List that can be serialized to json');
+      throw Exception(
+          'the data argument can only be a Map or List that can be serialized to json');
     }
   }
   return Response(

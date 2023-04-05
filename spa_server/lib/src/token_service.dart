@@ -4,7 +4,8 @@ import 'package:spa_server/src/utils.dart';
 import 'package:uuid/uuid.dart';
 
 const refreshTokenExpiryDuration = Duration(days: 30);
-const accessTokenExpiryDuration = Duration(days: 10); // should be like 15 minutes. but for the sake of testing
+const accessTokenExpiryDuration = Duration(
+    days: 10); // should be like 15 minutes. but for the sake of testing
 
 class TokenService {
   TokenService({required this.db, required this.secret});
@@ -37,12 +38,14 @@ class TokenService {
       expiry: refreshTokenExpiryDuration,
     );
 
-    await addRefereshTokenToRedis(tokenId, refreshToken, refreshTokenExpiryDuration);
+    await addRefereshTokenToRedis(
+        tokenId, refreshToken, refreshTokenExpiryDuration);
 
     return TokenPair(idToken: token, refreshToken: refreshToken);
   }
 
-  Future addRefereshTokenToRedis(String id, String token, Duration expiry) async {
+  Future addRefereshTokenToRedis(
+      String id, String token, Duration expiry) async {
     await _cache?.send_object(["SET", "$_prefix:$id", token]);
     await _cache?.send_object(["EXPIRE", "$_prefix:$id", expiry.inSeconds]);
   }

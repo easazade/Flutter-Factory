@@ -1,4 +1,3 @@
-
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:shelf_router/shelf_router.dart';
@@ -26,15 +25,17 @@ class UsersApi {
 
     router.get('/me', (Request request) async {
       final authDetails = request.context['authDetails'] as JWT;
-      final user = await userStore.findOne(where.eq('_id', ObjectId.fromHexString(authDetails.subject!)));
+      final user = await userStore.findOne(
+          where.eq('_id', ObjectId.fromHexString(authDetails.subject!)));
       return createSuccessResponse(
         data: user
-          ?..remove('password') 
+          ?..remove('password')
           ..remove('salt'),
       );
     });
 
-    final handler = Pipeline().addMiddleware(checkAuthorization()).addHandler(router);
+    final handler =
+        Pipeline().addMiddleware(checkAuthorization()).addHandler(router);
 
     return handler;
   }

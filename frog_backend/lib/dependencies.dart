@@ -8,7 +8,8 @@ part 'dependencies.g.dart';
 @JsonSerializable()
 class Dependency1 {
   Dependency1(this.name);
-  factory Dependency1.fromJson(Map<String, dynamic> json) => _$Dependency1FromJson(json);
+  factory Dependency1.fromJson(Map<String, dynamic> json) =>
+      _$Dependency1FromJson(json);
 
   final String name;
 
@@ -18,7 +19,8 @@ class Dependency1 {
 @JsonSerializable()
 class Dependency2 {
   Dependency2(this.name);
-  factory Dependency2.fromJson(Map<String, dynamic> json) => _$Dependency2FromJson(json);
+  factory Dependency2.fromJson(Map<String, dynamic> json) =>
+      _$Dependency2FromJson(json);
 
   final String name;
 
@@ -31,8 +33,10 @@ Middleware dependenciesProvider() {
   return (handler) {
     return (context) {
       context = context
-          .provide<Future<Dependency2>>(() => Future.value(Dependency2('dependency 2')))
-          .provide<Dependency1>(() => _dependency1Cache ??= Dependency1('dependency 1'));
+          .provide<Future<Dependency2>>(
+              () => Future.value(Dependency2('dependency 2')))
+          .provide<Dependency1>(
+              () => _dependency1Cache ??= Dependency1('dependency 1'));
 
       return handler(context);
     };

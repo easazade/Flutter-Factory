@@ -1,5 +1,3 @@
-
-
 abstract class Pet {
   Pet({required this.type, required this.says});
   final String type;
@@ -9,9 +7,11 @@ abstract class Pet {
 }
 
 class Fox extends Pet {
-  Fox() : super(type: 'Fox', says: 'Roof Roof roof roof rooroof rooroof');
+  Fox({this.canFly}) : super(type: 'Fox', says: 'Roof Roof roof roof rooroof rooroof');
+
+  final bool? canFly;
 }
 
-Future<String> method() async {
-  return 'nothing';
+Future<String> method(String? name) async {
+  return name ?? 'nothing';
 }

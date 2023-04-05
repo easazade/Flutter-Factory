@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "jaspr serving",
+            "request": "launch",
+            "type": "dart",
+            // "flutterMode": "debug",
+            "program": "lib/main.dart",
+            "args": [
+                "jaspr",
+                "serve",
+                "--enable-vm-service",
+            ]
+        },
+    ],
+}

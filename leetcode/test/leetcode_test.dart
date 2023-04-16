@@ -3,11 +3,17 @@ import 'dart:math';
 import 'package:leetcode/longest_common_prefix.dart';
 import 'package:leetcode/roman_to_integer.dart';
 import 'package:leetcode/two_sum.dart';
+import 'package:leetcode/validParentheses.dart';
 import 'package:test/test.dart';
 
 final _random = Random();
 
 void main() {
+  test('validParentheses test', () {
+    final strings = '[][';
+    meastureTime(() => validParentheses(strings));
+  });
+
   test('longestCommonPrefix test', () {
     final strings = ["flower", "flow", "flight"];
     // final strings = ["dog", "racecar", "car"];

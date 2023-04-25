@@ -211,8 +211,7 @@ class CompletePostPostViewQueryable extends KeyedViewQueryable<CompletePostPostV
   String encodeKey(int key) => TextEncoder.i.encode(key);
 
   @override
-  String get query =>
-      'SELECT "posts".*, row_to_json("author".*) as "author", row_to_json("editor".*) as "editor"'
+  String get query => 'SELECT "posts".*, row_to_json("author".*) as "author", row_to_json("editor".*) as "editor"'
       'FROM "posts"'
       'LEFT JOIN (${ReducedUserUserViewQueryable().query}) "author"'
       'ON "posts"."author_id" = "author"."id"'
@@ -372,7 +371,7 @@ class UserViewQueryable extends KeyedViewQueryable<UserView, int> {
       'LEFT JOIN ('
       '  SELECT "posts"."author_id",'
       '    to_jsonb(array_agg("posts".*)) as data'
-      '  FROM (${PostViewQueryable().query}) "posts"'
+      '  FROM (${PostViewQueryable().query}) "posts"' // ERROR: here
       '  GROUP BY "posts"."author_id"'
       ') "posts"'
       'ON "users"."id" = "posts"."author_id"';
@@ -385,7 +384,7 @@ class UserViewQueryable extends KeyedViewQueryable<UserView, int> {
       id: map.get('id'),
       name: map.get('name'),
       bio: map.get('bio'),
-      posts: map.getListOpt('posts', PostViewQueryable().decoder) ?? const []);
+      posts: map.getListOpt('posts', PostViewQueryable().decoder) ?? const []); // ERROR: here
 }
 
 class UserView {
@@ -399,5 +398,5 @@ class UserView {
   final int id;
   final String name;
   final String bio;
-  final List<PostView> posts;
+  final List<PostView> posts; // ERROR: here
 }

@@ -5,6 +5,7 @@ part of 'models.dart';
 extension ModelsRepositories on Database {
   PostRepository get posts => PostRepository._(this);
   UserRepository get users => UserRepository._(this);
+  MeetingRepository get meetings => MeetingRepository._(this);
 }
 
 abstract class PostRepository
@@ -151,6 +152,66 @@ class _UserRepository extends BaseRepository
   }
 }
 
+abstract class MeetingRepository
+    implements
+        ModelRepository,
+        KeyedModelRepositoryInsert<MeetingInsertRequest>,
+        ModelRepositoryUpdate<MeetingUpdateRequest>,
+        ModelRepositoryDelete<int> {
+  factory MeetingRepository._(Database db) = _MeetingRepository;
+
+  Future<MeetingView?> queryMeeting(int id);
+  Future<List<MeetingView>> queryMeetings([QueryParams? params]);
+}
+
+class _MeetingRepository extends BaseRepository
+    with
+        KeyedRepositoryInsertMixin<MeetingInsertRequest>,
+        RepositoryUpdateMixin<MeetingUpdateRequest>,
+        RepositoryDeleteMixin<int>
+    implements MeetingRepository {
+  _MeetingRepository(super.db) : super(tableName: 'meetings_all', keyName: 'id');
+
+  @override
+  Future<MeetingView?> queryMeeting(int id) {
+    return queryOne(id, MeetingViewQueryable());
+  }
+
+  @override
+  Future<List<MeetingView>> queryMeetings([QueryParams? params]) {
+    return queryMany(MeetingViewQueryable(), params);
+  }
+
+  @override
+  Future<List<int>> insert(List<MeetingInsertRequest> requests) async {
+    if (requests.isEmpty) return [];
+    var values = QueryValues();
+    var rows = await db.query(
+      'INSERT INTO "meetings_all" ( "location" )\n'
+      'VALUES ${requests.map((r) => '( ${values.add(LatLngConverter().tryEncode(r.location))}:point )').join(', ')}\n'
+      'RETURNING "id"',
+      values.values,
+    );
+    var result = rows.map<int>((r) => TextEncoder.i.decode(r.toColumnMap()['id'])).toList();
+
+    return result;
+  }
+
+  @override
+  Future<void> update(List<MeetingUpdateRequest> requests) async {
+    if (requests.isEmpty) return;
+    var values = QueryValues();
+    await db.query(
+      'UPDATE "meetings_all"\n'
+      'SET "location" = COALESCE(UPDATED."location", "meetings_all"."location")\n'
+      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.id)}:int8::int8, ${values.add(LatLngConverter().tryEncode(r.location))}:point::point )').join(', ')} )\n'
+      'AS UPDATED("id", "location")\n'
+      'WHERE "meetings_all"."id" = UPDATED."id"',
+      values.values,
+    );
+  }
+}
+
 class PostInsertRequest {
   PostInsertRequest({
     required this.title,
@@ -173,6 +234,14 @@ class UserInsertRequest {
 
   final String name;
   final String bio;
+}
+
+class MeetingInsertRequest {
+  MeetingInsertRequest({
+    required this.location,
+  });
+
+  final LatLng location;
 }
 
 class PostUpdateRequest {
@@ -201,6 +270,16 @@ class UserUpdateRequest {
   final int id;
   final String? name;
   final String? bio;
+}
+
+class MeetingUpdateRequest {
+  MeetingUpdateRequest({
+    required this.id,
+    this.location,
+  });
+
+  final int id;
+  final LatLng? location;
 }
 
 class CompletePostPostViewQueryable extends KeyedViewQueryable<CompletePostPostView, int> {
@@ -350,4 +429,33 @@ class ReducedUserUserView {
   final int id;
   final String name;
   final String bio;
+}
+
+class MeetingViewQueryable extends KeyedViewQueryable<MeetingView, int> {
+  @override
+  String get keyName => 'id';
+
+  @override
+  String encodeKey(int key) => TextEncoder.i.encode(key);
+
+  @override
+  String get query => 'SELECT "meetings_all".*'
+      'FROM "meetings_all"';
+
+  @override
+  String get tableAlias => 'meetings_all';
+
+  @override
+  MeetingView decode(TypedMap map) =>
+      MeetingView(id: map.get('id'), location: map.get('location', LatLngConverter().decode));
+}
+
+class MeetingView {
+  MeetingView({
+    required this.id,
+    required this.location,
+  });
+
+  final int id;
+  final LatLng location;
 }

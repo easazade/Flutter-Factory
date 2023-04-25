@@ -43,38 +43,38 @@ abstract class User {
 
 
 
-// @Model(tableName: 'sitepages')
-// abstract class Meeting {
-//   @PrimaryKey()
-//   @AutoIncrement()
-//   int get id;
+@Model(tableName: 'meetings_all')
+abstract class Meeting {
+  @PrimaryKey()
+  @AutoIncrement()
+  int get id;
 
-//   @UseConverter(LatLngConverter())
-//   LatLng get location;
-// }
+  @UseConverter(LatLngConverter())
+  LatLng get location;
+}
 
-// class LatLng {
-//   final double latitude;
-//   final double longitude;
+class LatLng {
+  final double latitude;
+  final double longitude;
 
-//   LatLng(this.latitude, this.longitude);
-// }
+  LatLng(this.latitude, this.longitude);
+}
 
-// class LatLngConverter extends TypeConverter<LatLng> {
-//   const LatLngConverter() : super('point');
+class LatLngConverter extends TypeConverter<LatLng> {
+  const LatLngConverter() : super('point');
 
-//   @override
-//   dynamic encode(LatLng value) => PgPoint(value.latitude, value.longitude);
+  @override
+  dynamic encode(LatLng value) => PgPoint(value.latitude, value.longitude);
 
-//   @override
-//   LatLng decode(dynamic value) {
-//     if (value is PgPoint) {
-//       return LatLng(value.latitude, value.longitude);
-//     } else {
-//       var m = RegExp(r'\((.+),(.+)\)').firstMatch(value.toString());
-//       var lat = double.parse(m!.group(1)!.trim());
-//       var lng = double.parse(m.group(2)!.trim());
-//       return LatLng(lat, lng);
-//     }
-//   }
-// }
+  @override
+  LatLng decode(dynamic value) {
+    if (value is PgPoint) {
+      return LatLng(value.latitude, value.longitude);
+    } else {
+      var m = RegExp(r'\((.+),(.+)\)').firstMatch(value.toString());
+      var lat = double.parse(m!.group(1)!.trim());
+      var lng = double.parse(m.group(2)!.trim());
+      return LatLng(lat, lng);
+    }
+  }
+}

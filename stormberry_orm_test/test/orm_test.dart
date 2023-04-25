@@ -1,4 +1,5 @@
 import 'package:stormberry/stormberry.dart';
+import 'package:stormberry_orm_test/actions.dart';
 import 'package:stormberry_orm_test/models.dart';
 import 'package:stormberry_orm_test/utils.dart';
 import 'package:test/test.dart';
@@ -30,5 +31,33 @@ void main() {
         authorId: userId,
       ),
     );
+  });
+
+  test('get post by custom query', () async {
+    final postWithId = await db.posts.query(
+      FindPostQuery(postId: 1),
+      QueryParams(),
+    );
+    print(postWithId?.id);
+    print(postWithId?.title);
+    print(postWithId?.content);
+  });
+
+  test('update post by custom action ', () async {
+    final postId = 1;
+    var postWithId = await db.posts.query(
+      FindPostQuery(postId: postId),
+      QueryParams(),
+    );
+
+    print('title was = ${postWithId?.title}');
+
+    final newTitle = postWithId?.title == '!!! TITLE - UPDATED' ? 'some other title - updated' : '!!! TITLE - UPDATED';
+
+    await db.posts.run(UpdateTitleAction(title: newTitle), postWithId);
+
+    postWithId = await db.posts.query(FindPostQuery(postId: postId), QueryParams());
+
+    print('title changed to = ${postWithId?.title}');
   });
 }

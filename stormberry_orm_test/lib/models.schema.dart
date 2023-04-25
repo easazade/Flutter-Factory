@@ -1,8 +1,8 @@
 // ignore_for_file: annotate_overrides
 
-part of 'user.dart';
+part of 'models.dart';
 
-extension UserRepositories on Database {
+extension ModelsRepositories on Database {
   PostRepository get posts => PostRepository._(this);
   UserRepository get users => UserRepository._(this);
 }

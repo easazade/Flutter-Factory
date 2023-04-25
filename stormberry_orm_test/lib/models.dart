@@ -1,6 +1,6 @@
 import 'package:stormberry/stormberry.dart';
 
-part 'user.schema.dart';
+part 'models.schema.dart';
 
 @Model(views: [#CompletePost, #ReducedPost])
 abstract class Post {

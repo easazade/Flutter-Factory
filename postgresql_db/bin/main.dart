@@ -4,9 +4,19 @@ import 'dart:io';
 import 'package:postgresql_db/postgresql_db.dart' as postgresql_db;
 import 'package:postgres/postgres.dart';
 
+/// return an environment variable with the given [key] if exists
+String? envVar(String key) => Platform.environment[key];
+int? envIntVar(String key) => int.tryParse(envVar(key) ?? '');
+bool envBoolVar(String key) => envVar(key) == 'true';
+
 void main(List<String> arguments) async {
-  final connection = PostgreSQLConnection('localhost', 5432, 'postgres_dart',
-      username: 'postgres', password: '1321');
+  final connection = PostgreSQLConnection(
+    envVar('DB_HOST_ADDRESS') ?? 'db-host-not-found',
+    envIntVar('DB_PORT') ?? 0,
+    envVar('DB_NAME') ?? 'db-name-not-found',
+    username: envVar('DB_USERNAME'),
+    password: envVar('DB_PASSWORD'),
+  );
   await connection.open();
   print('connected to postgres database');
 
@@ -44,8 +54,7 @@ void main(List<String> arguments) async {
   ''');
 
   // read data
-  final readResults =
-      await connection.mappedResultsQuery('SELECT * FROM customers');
+  final readResults = await connection.mappedResultsQuery('SELECT * FROM customers');
   print(readResults);
 
   // update data
@@ -55,10 +64,8 @@ void main(List<String> arguments) async {
   await connection.query('DELETE FROM customers WHERE id > 8');
 
   // insert our fake data into database
-  await _insertFakeCustomersInDatabase(connection,
-      doAllInsertionsInOneTransaction: true);
-  await _insertFakeOrdersInDatabase(connection,
-      doAllInsertionsInOneTransaction: true);
+  await _insertFakeCustomersInDatabase(connection, doAllInsertionsInOneTransaction: true);
+  await _insertFakeOrdersInDatabase(connection, doAllInsertionsInOneTransaction: true);
 
   // do a join query
   var joinResult = await connection.mappedResultsQuery('''

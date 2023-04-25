@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:postgresql_db/postgresql_db.dart' as postgresql_db;
 import 'package:postgres/postgres.dart';
 
 /// return an environment variable with the given [key] if exists
@@ -11,9 +10,9 @@ bool envBoolVar(String key) => envVar(key) == 'true';
 
 void main(List<String> arguments) async {
   final connection = PostgreSQLConnection(
-    envVar('DB_HOST_ADDRESS') ?? 'db-host-not-found',
+    envVar('DB_HOST_ADDRESS') ?? '',
     envIntVar('DB_PORT') ?? 0,
-    envVar('DB_NAME') ?? 'db-name-not-found',
+    envVar('DB_NAME') ?? 'db-name-notfound',
     username: envVar('DB_USERNAME'),
     password: envVar('DB_PASSWORD'),
   );

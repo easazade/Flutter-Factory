@@ -156,13 +156,13 @@ class PostInsertRequest {
     required this.title,
     required this.content,
     required this.authorId,
-    required this.editorId,
+    this.editorId,
   });
 
   final String title;
   final String content;
   final int authorId;
-  final int editorId;
+  final int? editorId;
 }
 
 class UserInsertRequest {
@@ -211,11 +211,12 @@ class CompletePostPostViewQueryable extends KeyedViewQueryable<CompletePostPostV
   String encodeKey(int key) => TextEncoder.i.encode(key);
 
   @override
-  String get query => 'SELECT "posts".*, row_to_json("author".*) as "author", row_to_json("editor".*) as "editor"'
+  String get query =>
+      'SELECT "posts".*, row_to_json("author".*) as "author", row_to_json("editor".*) as "editor"'
       'FROM "posts"'
       'LEFT JOIN (${ReducedUserUserViewQueryable().query}) "author"'
       'ON "posts"."author_id" = "author"."id"'
-      'LEFT JOIN (${UserViewQueryable().query}) "editor"'
+      'LEFT JOIN (${ReducedUserUserViewQueryable().query}) "editor"'
       'ON "posts"."editor_id" = "editor"."id"';
 
   @override
@@ -227,7 +228,7 @@ class CompletePostPostViewQueryable extends KeyedViewQueryable<CompletePostPostV
       title: map.get('title'),
       content: map.get('content'),
       author: map.get('author', ReducedUserUserViewQueryable().decoder),
-      editor: map.get('editor', UserViewQueryable().decoder));
+      editor: map.getOpt('editor', ReducedUserUserViewQueryable().decoder));
 }
 
 class CompletePostPostView {
@@ -236,14 +237,14 @@ class CompletePostPostView {
     required this.title,
     required this.content,
     required this.author,
-    required this.editor,
+    this.editor,
   });
 
   final int id;
   final String title;
   final String content;
   final ReducedUserUserView author;
-  final UserView editor;
+  final ReducedUserUserView? editor;
 }
 
 class ReducedPostPostViewQueryable extends KeyedViewQueryable<ReducedPostPostView, int> {
@@ -254,20 +255,15 @@ class ReducedPostPostViewQueryable extends KeyedViewQueryable<ReducedPostPostVie
   String encodeKey(int key) => TextEncoder.i.encode(key);
 
   @override
-  String get query => 'SELECT "posts".*, row_to_json("editor".*) as "editor"'
-      'FROM "posts"'
-      'LEFT JOIN (${UserViewQueryable().query}) "editor"'
-      'ON "posts"."editor_id" = "editor"."id"';
+  String get query => 'SELECT "posts".*'
+      'FROM "posts"';
 
   @override
   String get tableAlias => 'posts';
 
   @override
-  ReducedPostPostView decode(TypedMap map) => ReducedPostPostView(
-      id: map.get('id'),
-      title: map.get('title'),
-      content: map.get('content'),
-      editor: map.get('editor', UserViewQueryable().decoder));
+  ReducedPostPostView decode(TypedMap map) =>
+      ReducedPostPostView(id: map.get('id'), title: map.get('title'), content: map.get('content'));
 }
 
 class ReducedPostPostView {
@@ -275,13 +271,11 @@ class ReducedPostPostView {
     required this.id,
     required this.title,
     required this.content,
-    required this.editor,
   });
 
   final int id;
   final String title;
   final String content;
-  final UserView editor;
 }
 
 class CompleteUserUserViewQueryable extends KeyedViewQueryable<CompleteUserUserView, int> {
@@ -356,47 +350,4 @@ class ReducedUserUserView {
   final int id;
   final String name;
   final String bio;
-}
-
-class UserViewQueryable extends KeyedViewQueryable<UserView, int> {
-  @override
-  String get keyName => 'id';
-
-  @override
-  String encodeKey(int key) => TextEncoder.i.encode(key);
-
-  @override
-  String get query => 'SELECT "users".*, "posts"."data" as "posts"'
-      'FROM "users"'
-      'LEFT JOIN ('
-      '  SELECT "posts"."author_id",'
-      '    to_jsonb(array_agg("posts".*)) as data'
-      '  FROM (${PostViewQueryable().query}) "posts"' // ERROR: here
-      '  GROUP BY "posts"."author_id"'
-      ') "posts"'
-      'ON "users"."id" = "posts"."author_id"';
-
-  @override
-  String get tableAlias => 'users';
-
-  @override
-  UserView decode(TypedMap map) => UserView(
-      id: map.get('id'),
-      name: map.get('name'),
-      bio: map.get('bio'),
-      posts: map.getListOpt('posts', PostViewQueryable().decoder) ?? const []); // ERROR: here
-}
-
-class UserView {
-  UserView({
-    required this.id,
-    required this.name,
-    required this.bio,
-    required this.posts,
-  });
-
-  final int id;
-  final String name;
-  final String bio;
-  final List<PostView> posts; // ERROR: here
 }

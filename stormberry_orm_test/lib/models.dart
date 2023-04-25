@@ -20,7 +20,9 @@ abstract class Post {
   @HiddenIn(#ReducedPost)
   User get author;
 
-  User get editor;
+  @ViewedIn(#CompletePost, as: #ReducedUser)
+  @HiddenIn(#ReducedPost)
+  User? get editor;
 }
 
 @Model(views: [#CompleteUser, #ReducedUser])

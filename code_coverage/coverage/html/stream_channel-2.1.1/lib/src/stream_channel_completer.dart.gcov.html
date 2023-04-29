@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - lcov.info - stream_channel-2.1.1/lib/src/stream_channel_completer.dart</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">stream_channel-2.1.1/lib/src</a> - stream_channel_completer.dart<span style="font-size: 80%;"> (source / <a href="stream_channel_completer.dart.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">lcov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2023-04-29 12:42:55</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // Copyright (c) 2016, the Dart project authors.  Please see the AUTHORS file</a>
+<a name="2"><span class="lineNum">       2 </span>            : // for details. All rights reserved. Use of this source code is governed by a</a>
+<a name="3"><span class="lineNum">       3 </span>            : // BSD-style license that can be found in the LICENSE file.</a>
+<a name="4"><span class="lineNum">       4 </span>            : </a>
+<a name="5"><span class="lineNum">       5 </span>            : import 'package:async/async.dart';</a>
+<a name="6"><span class="lineNum">       6 </span>            : </a>
+<a name="7"><span class="lineNum">       7 </span>            : import '../stream_channel.dart';</a>
+<a name="8"><span class="lineNum">       8 </span>            : </a>
+<a name="9"><span class="lineNum">       9 </span>            : /// A [channel] where the source and destination are provided later.</a>
+<a name="10"><span class="lineNum">      10 </span>            : ///</a>
+<a name="11"><span class="lineNum">      11 </span>            : /// The [channel] is a normal channel that can be listened to and that events</a>
+<a name="12"><span class="lineNum">      12 </span>            : /// can be added to immediately, but until [setChannel] is called it won't emit</a>
+<a name="13"><span class="lineNum">      13 </span>            : /// any events and all events added to it will be buffered.</a>
+<a name="14"><span class="lineNum">      14 </span>            : class StreamChannelCompleter&lt;T&gt; {</a>
+<a name="15"><span class="lineNum">      15 </span>            :   /// The completer for this channel's stream.</a>
+<a name="16"><span class="lineNum">      16 </span>            :   final _streamCompleter = StreamCompleter&lt;T&gt;();</a>
+<a name="17"><span class="lineNum">      17 </span>            : </a>
+<a name="18"><span class="lineNum">      18 </span>            :   /// The completer for this channel's sink.</a>
+<a name="19"><span class="lineNum">      19 </span>            :   final _sinkCompleter = StreamSinkCompleter&lt;T&gt;();</a>
+<a name="20"><span class="lineNum">      20 </span>            : </a>
+<a name="21"><span class="lineNum">      21 </span>            :   /// The channel for this completer.</a>
+<a name="22"><span class="lineNum">      22 </span><span class="lineNoCov">          0 :   StreamChannel&lt;T&gt; get channel =&gt; _channel;</span></a>
+<a name="23"><span class="lineNum">      23 </span>            :   late final StreamChannel&lt;T&gt; _channel;</a>
+<a name="24"><span class="lineNum">      24 </span>            : </a>
+<a name="25"><span class="lineNum">      25 </span>            :   /// Whether [setChannel] has been called.</a>
+<a name="26"><span class="lineNum">      26 </span>            :   bool _set = false;</a>
+<a name="27"><span class="lineNum">      27 </span>            : </a>
+<a name="28"><span class="lineNum">      28 </span>            :   /// Convert a `Future&lt;StreamChannel&gt;` to a `StreamChannel`.</a>
+<a name="29"><span class="lineNum">      29 </span>            :   ///</a>
+<a name="30"><span class="lineNum">      30 </span>            :   /// This creates a channel using a channel completer, and sets the source</a>
+<a name="31"><span class="lineNum">      31 </span>            :   /// channel to the result of the future when the future completes.</a>
+<a name="32"><span class="lineNum">      32 </span>            :   ///</a>
+<a name="33"><span class="lineNum">      33 </span>            :   /// If the future completes with an error, the returned channel's stream will</a>
+<a name="34"><span class="lineNum">      34 </span>            :   /// instead contain just that error. The sink will silently discard all</a>
+<a name="35"><span class="lineNum">      35 </span>            :   /// events.</a>
+<a name="36"><span class="lineNum">      36 </span><span class="lineNoCov">          0 :   static StreamChannel fromFuture(Future&lt;StreamChannel&gt; channelFuture) {</span></a>
+<a name="37"><span class="lineNum">      37 </span><span class="lineNoCov">          0 :     var completer = StreamChannelCompleter();</span></a>
+<a name="38"><span class="lineNum">      38 </span><span class="lineNoCov">          0 :     channelFuture.then(completer.setChannel, onError: completer.setError);</span></a>
+<a name="39"><span class="lineNum">      39 </span><span class="lineNoCov">          0 :     return completer.channel;</span></a>
+<a name="40"><span class="lineNum">      40 </span>            :   }</a>
+<a name="41"><span class="lineNum">      41 </span>            : </a>
+<a name="42"><span class="lineNum">      42 </span><span class="lineNoCov">          0 :   StreamChannelCompleter() {</span></a>
+<a name="43"><span class="lineNum">      43 </span><span class="lineNoCov">          0 :     _channel = StreamChannel&lt;T&gt;(_streamCompleter.stream, _sinkCompleter.sink);</span></a>
+<a name="44"><span class="lineNum">      44 </span>            :   }</a>
+<a name="45"><span class="lineNum">      45 </span>            : </a>
+<a name="46"><span class="lineNum">      46 </span>            :   /// Set a channel as the source and destination for [channel].</a>
+<a name="47"><span class="lineNum">      47 </span>            :   ///</a>
+<a name="48"><span class="lineNum">      48 </span>            :   /// A channel may be set at most once.</a>
+<a name="49"><span class="lineNum">      49 </span>            :   ///</a>
+<a name="50"><span class="lineNum">      50 </span>            :   /// Either [setChannel] or [setError] may be called at most once. Trying to</a>
+<a name="51"><span class="lineNum">      51 </span>            :   /// call either of them again will fail.</a>
+<a name="52"><span class="lineNum">      52 </span><span class="lineNoCov">          0 :   void setChannel(StreamChannel&lt;T&gt; channel) {</span></a>
+<a name="53"><span class="lineNum">      53 </span><span class="lineNoCov">          0 :     if (_set) throw StateError('The channel has already been set.');</span></a>
+<a name="54"><span class="lineNum">      54 </span><span class="lineNoCov">          0 :     _set = true;</span></a>
+<a name="55"><span class="lineNum">      55 </span>            : </a>
+<a name="56"><span class="lineNum">      56 </span><span class="lineNoCov">          0 :     _streamCompleter.setSourceStream(channel.stream);</span></a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :     _sinkCompleter.setDestinationSink(channel.sink);</span></a>
+<a name="58"><span class="lineNum">      58 </span>            :   }</a>
+<a name="59"><span class="lineNum">      59 </span>            : </a>
+<a name="60"><span class="lineNum">      60 </span>            :   /// Indicates that there was an error connecting the channel.</a>
+<a name="61"><span class="lineNum">      61 </span>            :   ///</a>
+<a name="62"><span class="lineNum">      62 </span>            :   /// This makes the stream emit [error] and close. It makes the sink discard</a>
+<a name="63"><span class="lineNum">      63 </span>            :   /// all its events.</a>
+<a name="64"><span class="lineNum">      64 </span>            :   ///</a>
+<a name="65"><span class="lineNum">      65 </span>            :   /// Either [setChannel] or [setError] may be called at most once. Trying to</a>
+<a name="66"><span class="lineNum">      66 </span>            :   /// call either of them again will fail.</a>
+<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :   void setError(Object error, [StackTrace? stackTrace]) {</span></a>
+<a name="68"><span class="lineNum">      68 </span><span class="lineNoCov">          0 :     if (_set) throw StateError('The channel has already been set.');</span></a>
+<a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :     _set = true;</span></a>
+<a name="70"><span class="lineNum">      70 </span>            : </a>
+<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :     _streamCompleter.setError(error, stackTrace);</span></a>
+<a name="72"><span class="lineNum">      72 </span><span class="lineNoCov">          0 :     _sinkCompleter.setDestinationSink(NullStreamSink());</span></a>
+<a name="73"><span class="lineNum">      73 </span>            :   }</a>
+<a name="74"><span class="lineNum">      74 </span>            : }</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="https://github.com/linux-test-project/lcov" target="_parent">LCOV version 1.16</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

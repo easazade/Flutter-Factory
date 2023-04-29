@@ -1,5 +1,5 @@
 import 'package:stormberry/stormberry.dart';
-import 'package:stormberry_orm_test/actions.dart';
+import 'package:stormberry_orm_test/actions_queries.dart';
 import 'package:stormberry_orm_test/models.dart';
 import 'package:stormberry_orm_test/utils.dart';
 import 'package:test/test.dart';
@@ -55,9 +55,13 @@ void main() {
     final newTitle = postWithId?.title == '!!! TITLE - UPDATED' ? 'some other title - updated' : '!!! TITLE - UPDATED';
 
     await db.posts.run(UpdateTitleAction(title: newTitle), postWithId);
+    // await db.posts.updatePostTitle(postWithId!, newTitle);
 
     postWithId = await db.posts.query(FindPostQuery(postId: postId), QueryParams());
 
+    final postWithTitle = await db.posts.query(FindReducedPostByTitleQuery(title: newTitle), QueryParams());
+
     print('title changed to = ${postWithId?.title}');
+    print('search post with title result = ${postWithTitle?.id} - ${postWithTitle?.title}');
   });
 }

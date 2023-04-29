@@ -1,4 +1,5 @@
 import 'package:stormberry/stormberry.dart';
+import 'package:stormberry_orm_test/actions_queries.dart';
 
 part 'models.schema.dart';
 
@@ -41,8 +42,6 @@ abstract class User {
   List<Post> get posts;
 }
 
-
-
 @Model(tableName: 'meetings_all')
 abstract class Meeting {
   @PrimaryKey()
@@ -76,5 +75,11 @@ class LatLngConverter extends TypeConverter<LatLng> {
       var lng = double.parse(m.group(2)!.trim());
       return LatLng(lat, lng);
     }
+  }
+}
+
+extension PostsRespositoryX on PostRepository {
+  Future<void> updatePostTitle(ReducedPostPostView post, String newTitle) async {
+    await run(UpdateTitleAction(title: newTitle), post);
   }
 }

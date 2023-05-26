@@ -1,0 +1,6 @@
+class: Todo
+table: todos
+
+fields: 
+  name: String
+  isDone: bool

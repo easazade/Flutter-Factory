@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:pod_client/pod_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
@@ -50,11 +52,13 @@ class MyHomePageState extends State<MyHomePage> {
   // is successful.
   void _callHello() async {
     try {
-      final result = await client.user.user(_textEditingController.text);
+      final todo = Todo(name: _textEditingController.text, isDone: false);
+      final result = await client.todo.createTodo(todo);
       setState(() {
-        _resultMessage = result;
+        _errorMessage = null;
+        _resultMessage = jsonEncode(result.toJson());
       });
-    } catch (e, stack) {
+    } catch (e, _) {
       setState(() {
         _errorMessage = '$e';
       });

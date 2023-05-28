@@ -7,4 +7,5 @@ class DefaultPageWidget extends Widget {
       'runmode': Serverpod.instance!.runMode,
     };
   }
+
 }

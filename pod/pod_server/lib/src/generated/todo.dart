@@ -8,6 +8,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
+/// 3 # will make this comment a doc that will be added to the generated class
 class Todo extends _i1.TableRow {
   Todo({
     int? id,
@@ -29,8 +30,10 @@ class Todo extends _i1.TableRow {
 
   static final t = TodoTable();
 
+  /// name if the Todo
   String name;
 
+  /// status of the Todo
   bool isDone;
 
   @override
@@ -201,8 +204,10 @@ class TodoTable extends _i1.Table {
   /// the id will be null.
   final id = _i1.ColumnInt('id');
 
+  /// name if the Todo
   final name = _i1.ColumnString('name');
 
+  /// status of the Todo
   final isDone = _i1.ColumnBool('isDone');
 
   @override

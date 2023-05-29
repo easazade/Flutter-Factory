@@ -1,6 +1,10 @@
+### 3 # will make this comment a doc that will be added to the generated class
 class: Todo
 table: todos
 
 fields: 
+  ### name if the Todo
   name: String
+
+  ### status of the Todo
   isDone: bool

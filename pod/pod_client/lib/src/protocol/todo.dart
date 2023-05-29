@@ -8,6 +8,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 
+/// 3 # will make this comment a doc that will be added to the generated class
 class Todo extends _i1.SerializableEntity {
   Todo({
     this.id,
@@ -32,8 +33,10 @@ class Todo extends _i1.SerializableEntity {
   /// the id will be null.
   int? id;
 
+  /// name if the Todo
   String name;
 
+  /// status of the Todo
   bool isDone;
 
   @override

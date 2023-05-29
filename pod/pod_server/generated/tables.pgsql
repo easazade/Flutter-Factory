@@ -1,4 +1,19 @@
 --
+-- Class Secret as table secrets
+--
+
+CREATE TABLE "secrets" (
+  "id" serial,
+  "phrase" text NOT NULL,
+  "publicKey" text NOT NULL,
+  "privateKey" text
+);
+
+ALTER TABLE ONLY "secrets"
+  ADD CONSTRAINT secrets_pkey PRIMARY KEY (id);
+
+
+--
 -- Class Todo as table todos
 --
 

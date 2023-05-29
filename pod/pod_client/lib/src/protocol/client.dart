@@ -25,6 +25,19 @@ class _EndpointExample extends _i1.EndpointRef {
       );
 }
 
+class _EndpointSecrets extends _i1.EndpointRef {
+  _EndpointSecrets(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'secrets';
+
+  _i2.Future<void> getSecret() => caller.callServerEndpoint<void>(
+        'secrets',
+        'getSecret',
+        {},
+      );
+}
+
 class _EndpointTodo extends _i1.EndpointRef {
   _EndpointTodo(_i1.EndpointCaller caller) : super(caller);
 
@@ -64,11 +77,14 @@ class Client extends _i1.ServerpodClient {
           authenticationKeyManager: authenticationKeyManager,
         ) {
     example = _EndpointExample(this);
+    secrets = _EndpointSecrets(this);
     todo = _EndpointTodo(this);
     user = _EndpointUser(this);
   }
 
   late final _EndpointExample example;
+
+  late final _EndpointSecrets secrets;
 
   late final _EndpointTodo todo;
 
@@ -77,6 +93,7 @@ class Client extends _i1.ServerpodClient {
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'example': example,
+        'secrets': secrets,
         'todo': todo,
         'user': user,
       };

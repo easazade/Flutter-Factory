@@ -50,3 +50,20 @@ extraClasses:
 ```
 
 run `serverpod generate`
+
+# Session
+
+If you need additional information about a call, you may need to cast the Session to one of its subclasses, e.g., `MethodCallSession` or `StreamingSession`. The `MethodCallSession` object provides additional properties, such as the name of the endpoint and method and the underlying HttpRequest object.
+example:
+
+```dart
+session as MethodCallSession;
+var ipAddress = session.httpRequest.remoteIpAddress;
+```
+
+# Serverpod Singleton
+
+there is a `Serverpod.instance` that has some nifty functionalities.
+
+for example we can use `createSession` to create one manually (which we are responsible for closing it manually as well).
+`session.close()`. If we don't it will cause memory leaks.

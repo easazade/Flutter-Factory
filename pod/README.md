@@ -33,3 +33,20 @@ go to `pod_server/generated/tables.pgsql` and copy the command and paste and run
 
 to change servepod config like ports and stuf you can change it all in `pod_server/config/` folder for
 different environments.
+
+# Custom Serializable object
+
+to make a class persistable you should define a model.yaml in protocol. but just to have a class that can be passed as response and request body:
+
+create a `shared` package add it to server & client packages. create serializable models in it. they should
+have toJson() and a factory fromJson().
+export it in the file you want to be imported by serverpod.
+
+add the file and model as extraClasses in `xxx_server/config/generator.yaml` like below
+
+```yaml
+extraClasses:
+  - package:shared/shared.dart:Car
+```
+
+run `serverpod generate`

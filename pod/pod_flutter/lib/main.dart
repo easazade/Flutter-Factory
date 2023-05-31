@@ -98,6 +98,7 @@ class MyHomePageState extends State<MyHomePage> {
               resultMessage: _resultMessage,
               errorMessage: _errorMessage,
             ),
+            const SizedBox(height: 20),
             _ResultDisplay(
               resultMessage: _carResultMessage,
             ),

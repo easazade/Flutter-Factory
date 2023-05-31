@@ -7,41 +7,63 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../endpoints/example_endpoint.dart' as _i2;
-import '../endpoints/secrets_endpoint.dart' as _i3;
-import '../endpoints/todo_endpoint.dart' as _i4;
-import '../endpoints/user_endpoint.dart' as _i5;
-import 'package:pod_server/src/generated/todo.dart' as _i6;
+import '../endpoints/car_endpoint.dart' as _i2;
+import '../endpoints/example_endpoint.dart' as _i3;
+import '../endpoints/secrets_endpoint.dart' as _i4;
+import '../endpoints/todo_endpoint.dart' as _i5;
+import '../endpoints/user_endpoint.dart' as _i6;
+import 'package:pod_server/src/generated/todo.dart' as _i7;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
   void initializeEndpoints(_i1.Server server) {
     var endpoints = <String, _i1.Endpoint>{
-      'example': _i2.ExampleEndpoint()
+      'car': _i2.CarEndpoint()
+        ..initialize(
+          server,
+          'car',
+          null,
+        ),
+      'example': _i3.ExampleEndpoint()
         ..initialize(
           server,
           'example',
           null,
         ),
-      'secrets': _i3.SecretsEndpoint()
+      'secrets': _i4.SecretsEndpoint()
         ..initialize(
           server,
           'secrets',
           null,
         ),
-      'todo': _i4.TodoEndpoint()
+      'todo': _i5.TodoEndpoint()
         ..initialize(
           server,
           'todo',
           null,
         ),
-      'user': _i5.UserEndpoint()
+      'user': _i6.UserEndpoint()
         ..initialize(
           server,
           'user',
           null,
         ),
     };
+    connectors['car'] = _i1.EndpointConnector(
+      name: 'car',
+      endpoint: endpoints['car']!,
+      methodConnectors: {
+        'getCar': _i1.MethodConnector(
+          name: 'getCar',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['car'] as _i2.CarEndpoint).getCar(session),
+        )
+      },
+    );
     connectors['example'] = _i1.EndpointConnector(
       name: 'example',
       endpoint: endpoints['example']!,
@@ -59,7 +81,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['example'] as _i2.ExampleEndpoint).hello(
+              (endpoints['example'] as _i3.ExampleEndpoint).hello(
             session,
             params['name'],
           ),
@@ -77,7 +99,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['secrets'] as _i3.SecretsEndpoint).getSecret(session),
+              (endpoints['secrets'] as _i4.SecretsEndpoint).getSecret(session),
         )
       },
     );
@@ -90,7 +112,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'todo': _i1.ParameterDescription(
               name: 'todo',
-              type: _i1.getType<_i6.Todo>(),
+              type: _i1.getType<_i7.Todo>(),
               nullable: false,
             )
           },
@@ -98,7 +120,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['todo'] as _i4.TodoEndpoint).createTodo(
+              (endpoints['todo'] as _i5.TodoEndpoint).createTodo(
             session,
             params['todo'],
           ),
@@ -122,7 +144,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['user'] as _i5.UserEndpoint).user(
+              (endpoints['user'] as _i6.UserEndpoint).user(
             session,
             params['name'],
           ),

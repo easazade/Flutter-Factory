@@ -12,6 +12,7 @@ import 'package:serverpod/protocol.dart' as _i2;
 import 'example.dart' as _i3;
 import 'secrets.dart' as _i4;
 import 'todo.dart' as _i5;
+import 'package:shared/shared.dart' as _i6;
 export 'example.dart';
 export 'secrets.dart';
 export 'todo.dart';
@@ -146,6 +147,12 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i5.Todo?>()) {
       return (data != null ? _i5.Todo.fromJson(data, this) : null) as T;
     }
+    if (t == _i6.Car) {
+      return _i6.Car.fromJson(data, this) as T;
+    }
+    if (t == _i1.getType<_i6.Car?>()) {
+      return (data != null ? _i6.Car.fromJson(data, this) : null) as T;
+    }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
     } catch (_) {}
@@ -154,6 +161,9 @@ class Protocol extends _i1.SerializationManagerServer {
 
   @override
   String? getClassNameForObject(Object data) {
+    if (data is _i6.Car) {
+      return 'Car';
+    }
     if (data is _i3.Example) {
       return 'Example';
     }
@@ -168,6 +178,9 @@ class Protocol extends _i1.SerializationManagerServer {
 
   @override
   dynamic deserializeByClassName(Map<String, dynamic> data) {
+    if (data['className'] == 'Car') {
+      return deserialize<_i6.Car>(data['data']);
+    }
     if (data['className'] == 'Example') {
       return deserialize<_i3.Example>(data['data']);
     }

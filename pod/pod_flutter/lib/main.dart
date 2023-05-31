@@ -43,6 +43,7 @@ class MyHomePageState extends State<MyHomePage> {
   // These fields hold the last result or error message that we've received from
   // the server or null if no result exists yet.
   String? _resultMessage;
+  String? _carResultMessage;
   String? _errorMessage;
 
   final _textEditingController = TextEditingController();
@@ -50,13 +51,15 @@ class MyHomePageState extends State<MyHomePage> {
   // Calls the `hello` method of the `example` endpoint. Will set either the
   // `_resultMessage` or `_errorMessage` field, depending on if the call
   // is successful.
-  void _callHello() async {
+  void _sendRequest() async {
     try {
       final todo = Todo(name: _textEditingController.text, isDone: false);
       final result = await client.todo.createTodo(todo);
+      final carResult = await client.car.getCar();
       setState(() {
         _errorMessage = null;
         _resultMessage = jsonEncode(result.toJson());
+        _carResultMessage = carResult.name;
       });
     } catch (e, _) {
       setState(() {
@@ -87,13 +90,16 @@ class MyHomePageState extends State<MyHomePage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: ElevatedButton(
-                onPressed: _callHello,
+                onPressed: _sendRequest,
                 child: const Text('Send to Server'),
               ),
             ),
             _ResultDisplay(
               resultMessage: _resultMessage,
               errorMessage: _errorMessage,
+            ),
+            _ResultDisplay(
+              resultMessage: _carResultMessage,
             ),
           ],
         ),

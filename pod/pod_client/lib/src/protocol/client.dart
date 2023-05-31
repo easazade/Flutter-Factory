@@ -8,9 +8,23 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
-import 'package:pod_client/src/protocol/todo.dart' as _i3;
-import 'dart:io' as _i4;
-import 'protocol.dart' as _i5;
+import 'package:shared/src/shared_models/car.dart' as _i3;
+import 'package:pod_client/src/protocol/todo.dart' as _i4;
+import 'dart:io' as _i5;
+import 'protocol.dart' as _i6;
+
+class _EndpointCar extends _i1.EndpointRef {
+  _EndpointCar(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'car';
+
+  _i2.Future<_i3.Car> getCar() => caller.callServerEndpoint<_i3.Car>(
+        'car',
+        'getCar',
+        {},
+      );
+}
 
 class _EndpointExample extends _i1.EndpointRef {
   _EndpointExample(_i1.EndpointCaller caller) : super(caller);
@@ -44,8 +58,8 @@ class _EndpointTodo extends _i1.EndpointRef {
   @override
   String get name => 'todo';
 
-  _i2.Future<_i3.Todo> createTodo(_i3.Todo todo) =>
-      caller.callServerEndpoint<_i3.Todo>(
+  _i2.Future<_i4.Todo> createTodo(_i4.Todo todo) =>
+      caller.callServerEndpoint<_i4.Todo>(
         'todo',
         'createTodo',
         {'todo': todo},
@@ -68,19 +82,22 @@ class _EndpointUser extends _i1.EndpointRef {
 class Client extends _i1.ServerpodClient {
   Client(
     String host, {
-    _i4.SecurityContext? context,
+    _i5.SecurityContext? context,
     _i1.AuthenticationKeyManager? authenticationKeyManager,
   }) : super(
           host,
-          _i5.Protocol(),
+          _i6.Protocol(),
           context: context,
           authenticationKeyManager: authenticationKeyManager,
         ) {
+    car = _EndpointCar(this);
     example = _EndpointExample(this);
     secrets = _EndpointSecrets(this);
     todo = _EndpointTodo(this);
     user = _EndpointUser(this);
   }
+
+  late final _EndpointCar car;
 
   late final _EndpointExample example;
 
@@ -92,6 +109,7 @@ class Client extends _i1.ServerpodClient {
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
+        'car': car,
         'example': example,
         'secrets': secrets,
         'todo': todo,

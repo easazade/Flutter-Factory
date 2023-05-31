@@ -6,3 +6,5 @@ environment:
 
 dependencies:
   serverpod_client: ^1.1.1
+  shared:
+    path: ../shared

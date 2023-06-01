@@ -44,6 +44,7 @@ class MyHomePageState extends State<MyHomePage> {
   // the server or null if no result exists yet.
   String? _resultMessage;
   String? _carResultMessage;
+  String? _userResult;
   String? _errorMessage;
 
   final _textEditingController = TextEditingController();
@@ -56,6 +57,11 @@ class MyHomePageState extends State<MyHomePage> {
       final todo = Todo(name: _textEditingController.text, isDone: false);
       final result = await client.todo.createTodo(todo);
       final carResult = await client.car.getCar();
+      try {
+        _userResult = await client.user.user('name');
+      } on AppException catch (e) {
+        _userResult = '${e.message} | ${e.type.name}';
+      }
       setState(() {
         _errorMessage = null;
         _resultMessage = jsonEncode(result.toJson());
@@ -101,6 +107,10 @@ class MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 20),
             _ResultDisplay(
               resultMessage: _carResultMessage,
+            ),
+            const SizedBox(height: 20),
+            _ResultDisplay(
+              resultMessage: _userResult,
             ),
           ],
         ),

@@ -8,9 +8,11 @@
 library protocol; // ignore_for_file: no_leading_underscores_for_library_prefixes
 
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'example.dart' as _i2;
-import 'todo.dart' as _i3;
-import 'package:shared/shared.dart' as _i4;
+import 'error_type.dart' as _i2;
+import 'example.dart' as _i3;
+import 'todo.dart' as _i4;
+import 'package:shared/shared.dart' as _i5;
+export 'error_type.dart';
 export 'example.dart';
 export 'todo.dart';
 export 'client.dart';
@@ -33,36 +35,45 @@ class Protocol extends _i1.SerializationManager {
     if (customConstructors.containsKey(t)) {
       return customConstructors[t]!(data, this) as T;
     }
-    if (t == _i2.Example) {
-      return _i2.Example.fromJson(data, this) as T;
+    if (t == _i2.ErrorType) {
+      return _i2.ErrorType.fromJson(data) as T;
     }
-    if (t == _i3.Todo) {
-      return _i3.Todo.fromJson(data, this) as T;
+    if (t == _i3.Example) {
+      return _i3.Example.fromJson(data, this) as T;
     }
-    if (t == _i1.getType<_i2.Example?>()) {
-      return (data != null ? _i2.Example.fromJson(data, this) : null) as T;
+    if (t == _i4.Todo) {
+      return _i4.Todo.fromJson(data, this) as T;
     }
-    if (t == _i1.getType<_i3.Todo?>()) {
-      return (data != null ? _i3.Todo.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<_i2.ErrorType?>()) {
+      return (data != null ? _i2.ErrorType.fromJson(data) : null) as T;
     }
-    if (t == _i4.Car) {
-      return _i4.Car.fromJson(data, this) as T;
+    if (t == _i1.getType<_i3.Example?>()) {
+      return (data != null ? _i3.Example.fromJson(data, this) : null) as T;
     }
-    if (t == _i1.getType<_i4.Car?>()) {
-      return (data != null ? _i4.Car.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<_i4.Todo?>()) {
+      return (data != null ? _i4.Todo.fromJson(data, this) : null) as T;
+    }
+    if (t == _i5.Car) {
+      return _i5.Car.fromJson(data, this) as T;
+    }
+    if (t == _i1.getType<_i5.Car?>()) {
+      return (data != null ? _i5.Car.fromJson(data, this) : null) as T;
     }
     return super.deserialize<T>(data, t);
   }
 
   @override
   String? getClassNameForObject(Object data) {
-    if (data is _i4.Car) {
+    if (data is _i5.Car) {
       return 'Car';
     }
-    if (data is _i2.Example) {
+    if (data is _i2.ErrorType) {
+      return 'ErrorType';
+    }
+    if (data is _i3.Example) {
       return 'Example';
     }
-    if (data is _i3.Todo) {
+    if (data is _i4.Todo) {
       return 'Todo';
     }
     return super.getClassNameForObject(data);
@@ -71,13 +82,16 @@ class Protocol extends _i1.SerializationManager {
   @override
   dynamic deserializeByClassName(Map<String, dynamic> data) {
     if (data['className'] == 'Car') {
-      return deserialize<_i4.Car>(data['data']);
+      return deserialize<_i5.Car>(data['data']);
+    }
+    if (data['className'] == 'ErrorType') {
+      return deserialize<_i2.ErrorType>(data['data']);
     }
     if (data['className'] == 'Example') {
-      return deserialize<_i2.Example>(data['data']);
+      return deserialize<_i3.Example>(data['data']);
     }
     if (data['className'] == 'Todo') {
-      return deserialize<_i3.Todo>(data['data']);
+      return deserialize<_i4.Todo>(data['data']);
     }
     return super.deserializeByClassName(data);
   }

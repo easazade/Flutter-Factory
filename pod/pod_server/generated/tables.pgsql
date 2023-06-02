@@ -27,3 +27,17 @@ ALTER TABLE ONLY "todos"
   ADD CONSTRAINT todos_pkey PRIMARY KEY (id);
 
 
+--
+-- Class User as table users
+--
+
+CREATE TABLE "users" (
+  "id" serial,
+  "username" text NOT NULL,
+  "password" text
+);
+
+ALTER TABLE ONLY "users"
+  ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+

@@ -1,0 +1,7 @@
+class: User
+table: users
+
+fields:
+  username: String
+  password: String?, database
+  preferences: List<String>?, api

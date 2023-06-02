@@ -11,9 +11,7 @@ import 'package:serverpod_flutter/serverpod_flutter.dart';
 // production servers.
 var client = Client('http://localhost:8080/')..connectivityMonitor = FlutterConnectivityMonitor();
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -96,8 +94,11 @@ class MyHomePageState extends State<MyHomePage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.black),
+                ),
                 onPressed: _sendRequest,
-                child: const Text('Send to Server'),
+                child: const Text('Send Request'),
               ),
             ),
             _ResultDisplay(

@@ -14,12 +14,14 @@ import 'error_type.dart' as _i4;
 import 'example.dart' as _i5;
 import 'secrets.dart' as _i6;
 import 'todo.dart' as _i7;
-import 'package:shared/shared.dart' as _i8;
+import 'user.dart' as _i8;
+import 'package:shared/shared.dart' as _i9;
 export 'app_exception.dart';
 export 'error_type.dart';
 export 'example.dart';
 export 'secrets.dart';
 export 'todo.dart';
+export 'user.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -121,6 +123,48 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
+    _i2.TableDefinition(
+      name: 'users',
+      schema: 'public',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.integer,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'users_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'username',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'password',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'users_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
+      ],
+      managed: true,
+    ),
     ..._i2.Protocol.targetDatabaseDefinition.tables,
   ]);
 
@@ -148,6 +192,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i7.Todo) {
       return _i7.Todo.fromJson(data, this) as T;
     }
+    if (t == _i8.User) {
+      return _i8.User.fromJson(data, this) as T;
+    }
     if (t == _i1.getType<_i3.AppException?>()) {
       return (data != null ? _i3.AppException.fromJson(data, this) : null) as T;
     }
@@ -163,11 +210,19 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i7.Todo?>()) {
       return (data != null ? _i7.Todo.fromJson(data, this) : null) as T;
     }
-    if (t == _i8.Car) {
-      return _i8.Car.fromJson(data, this) as T;
+    if (t == _i1.getType<_i8.User?>()) {
+      return (data != null ? _i8.User.fromJson(data, this) : null) as T;
     }
-    if (t == _i1.getType<_i8.Car?>()) {
-      return (data != null ? _i8.Car.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<List<String>?>()) {
+      return (data != null
+          ? (data as List).map((e) => deserialize<String>(e)).toList()
+          : null) as dynamic;
+    }
+    if (t == _i9.Car) {
+      return _i9.Car.fromJson(data, this) as T;
+    }
+    if (t == _i1.getType<_i9.Car?>()) {
+      return (data != null ? _i9.Car.fromJson(data, this) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -177,7 +232,7 @@ class Protocol extends _i1.SerializationManagerServer {
 
   @override
   String? getClassNameForObject(Object data) {
-    if (data is _i8.Car) {
+    if (data is _i9.Car) {
       return 'Car';
     }
     if (data is _i3.AppException) {
@@ -195,13 +250,16 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i7.Todo) {
       return 'Todo';
     }
+    if (data is _i8.User) {
+      return 'User';
+    }
     return super.getClassNameForObject(data);
   }
 
   @override
   dynamic deserializeByClassName(Map<String, dynamic> data) {
     if (data['className'] == 'Car') {
-      return deserialize<_i8.Car>(data['data']);
+      return deserialize<_i9.Car>(data['data']);
     }
     if (data['className'] == 'AppException') {
       return deserialize<_i3.AppException>(data['data']);
@@ -217,6 +275,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (data['className'] == 'Todo') {
       return deserialize<_i7.Todo>(data['data']);
+    }
+    if (data['className'] == 'User') {
+      return deserialize<_i8.User>(data['data']);
     }
     return super.deserializeByClassName(data);
   }
@@ -234,6 +295,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i6.Secret.t;
       case _i7.Todo:
         return _i7.Todo.t;
+      case _i8.User:
+        return _i8.User.t;
     }
     return null;
   }

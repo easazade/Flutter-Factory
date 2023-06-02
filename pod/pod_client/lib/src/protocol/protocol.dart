@@ -12,11 +12,13 @@ import 'app_exception.dart' as _i2;
 import 'error_type.dart' as _i3;
 import 'example.dart' as _i4;
 import 'todo.dart' as _i5;
-import 'package:shared/shared.dart' as _i6;
+import 'user.dart' as _i6;
+import 'package:shared/shared.dart' as _i7;
 export 'app_exception.dart';
 export 'error_type.dart';
 export 'example.dart';
 export 'todo.dart';
+export 'user.dart';
 export 'client.dart';
 
 class Protocol extends _i1.SerializationManager {
@@ -49,6 +51,9 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i5.Todo) {
       return _i5.Todo.fromJson(data, this) as T;
     }
+    if (t == _i6.User) {
+      return _i6.User.fromJson(data, this) as T;
+    }
     if (t == _i1.getType<_i2.AppException?>()) {
       return (data != null ? _i2.AppException.fromJson(data, this) : null) as T;
     }
@@ -61,18 +66,26 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i5.Todo?>()) {
       return (data != null ? _i5.Todo.fromJson(data, this) : null) as T;
     }
-    if (t == _i6.Car) {
-      return _i6.Car.fromJson(data, this) as T;
+    if (t == _i1.getType<_i6.User?>()) {
+      return (data != null ? _i6.User.fromJson(data, this) : null) as T;
     }
-    if (t == _i1.getType<_i6.Car?>()) {
-      return (data != null ? _i6.Car.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<List<String>?>()) {
+      return (data != null
+          ? (data as List).map((e) => deserialize<String>(e)).toList()
+          : null) as dynamic;
+    }
+    if (t == _i7.Car) {
+      return _i7.Car.fromJson(data, this) as T;
+    }
+    if (t == _i1.getType<_i7.Car?>()) {
+      return (data != null ? _i7.Car.fromJson(data, this) : null) as T;
     }
     return super.deserialize<T>(data, t);
   }
 
   @override
   String? getClassNameForObject(Object data) {
-    if (data is _i6.Car) {
+    if (data is _i7.Car) {
       return 'Car';
     }
     if (data is _i2.AppException) {
@@ -87,13 +100,16 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i5.Todo) {
       return 'Todo';
     }
+    if (data is _i6.User) {
+      return 'User';
+    }
     return super.getClassNameForObject(data);
   }
 
   @override
   dynamic deserializeByClassName(Map<String, dynamic> data) {
     if (data['className'] == 'Car') {
-      return deserialize<_i6.Car>(data['data']);
+      return deserialize<_i7.Car>(data['data']);
     }
     if (data['className'] == 'AppException') {
       return deserialize<_i2.AppException>(data['data']);
@@ -106,6 +122,9 @@ class Protocol extends _i1.SerializationManager {
     }
     if (data['className'] == 'Todo') {
       return deserialize<_i5.Todo>(data['data']);
+    }
+    if (data['className'] == 'User') {
+      return deserialize<_i6.User>(data['data']);
     }
     return super.deserializeByClassName(data);
   }

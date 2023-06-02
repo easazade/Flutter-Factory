@@ -14,12 +14,12 @@ When you are finished, you can shut down Serverpod with `Ctrl-C`, then stop Post
 
     docker compose stop
 
-# Tips and Tricks
+# Access postgres in docker
 
 to connect to postgres databse in docker run
-`docker exec -it pod_server_postgres_1 psql -U postgres`
+`docker exec -it pod_server-postgres-1 psql -U postgres`
 
-`pod_server_postgres_1` is the postgres container you can get the name from docker agent or running `docker ps` to list containers
+`pod_server-postgres-1` is the postgres container you can get the name from docker agent or running `docker ps` to list containers
 `-U` is for the user name of the database you can get these info from `pod_server/config/development.yaml` or `docker-compose.yaml`
 Database password is in docker-compose.yaml file
 

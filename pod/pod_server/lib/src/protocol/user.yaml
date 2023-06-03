@@ -5,3 +5,7 @@ fields:
   username: String
   password: String?, database
   preferences: List<String>?, api
+
+indexes:
+  username_idx:
+    fields: username

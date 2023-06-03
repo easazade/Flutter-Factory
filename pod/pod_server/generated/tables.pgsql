@@ -40,4 +40,6 @@ CREATE TABLE "users" (
 ALTER TABLE ONLY "users"
   ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
+CREATE INDEX username_idx ON "users" USING btree ("username");
+
 

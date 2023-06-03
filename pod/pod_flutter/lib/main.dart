@@ -43,6 +43,7 @@ class MyHomePageState extends State<MyHomePage> {
   String? _resultMessage;
   String? _carResultMessage;
   String? _userResult;
+  String? _createUserResult;
   String? _errorMessage;
 
   final _textEditingController = TextEditingController();
@@ -55,6 +56,8 @@ class MyHomePageState extends State<MyHomePage> {
       final todo = Todo(name: _textEditingController.text, isDone: false);
       final result = await client.todo.createTodo(todo);
       final carResult = await client.car.getCar();
+      final createUserResult = await client.user.createUser(_textEditingController.text);
+
       try {
         _userResult = await client.user.user('name');
       } on AppException catch (e) {
@@ -64,6 +67,7 @@ class MyHomePageState extends State<MyHomePage> {
         _errorMessage = null;
         _resultMessage = jsonEncode(result.toJson());
         _carResultMessage = carResult.name;
+        _createUserResult = 'created a user => ${jsonEncode(createUserResult)}';
       });
     } catch (e, _) {
       setState(() {
@@ -112,6 +116,10 @@ class MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 20),
             _ResultDisplay(
               resultMessage: _userResult,
+            ),
+            const SizedBox(height: 20),
+            _ResultDisplay(
+              resultMessage: _createUserResult,
             ),
           ],
         ),

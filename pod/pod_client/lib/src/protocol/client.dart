@@ -10,8 +10,9 @@ import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
 import 'package:shared/src/shared_models/car.dart' as _i3;
 import 'package:pod_client/src/protocol/todo.dart' as _i4;
-import 'dart:io' as _i5;
-import 'protocol.dart' as _i6;
+import 'package:pod_client/src/protocol/user.dart' as _i5;
+import 'dart:io' as _i6;
+import 'protocol.dart' as _i7;
 
 class _EndpointCar extends _i1.EndpointRef {
   _EndpointCar(_i1.EndpointCaller caller) : super(caller);
@@ -77,16 +78,23 @@ class _EndpointUser extends _i1.EndpointRef {
         'user',
         {'name': name},
       );
+
+  _i2.Future<_i5.User> createUser(String username) =>
+      caller.callServerEndpoint<_i5.User>(
+        'user',
+        'createUser',
+        {'username': username},
+      );
 }
 
 class Client extends _i1.ServerpodClient {
   Client(
     String host, {
-    _i5.SecurityContext? context,
+    _i6.SecurityContext? context,
     _i1.AuthenticationKeyManager? authenticationKeyManager,
   }) : super(
           host,
-          _i6.Protocol(),
+          _i7.Protocol(),
           context: context,
           authenticationKeyManager: authenticationKeyManager,
         ) {

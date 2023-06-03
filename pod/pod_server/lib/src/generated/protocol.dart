@@ -12,13 +12,15 @@ import 'package:serverpod/protocol.dart' as _i2;
 import 'app_exception.dart' as _i3;
 import 'error_type.dart' as _i4;
 import 'example.dart' as _i5;
-import 'secrets.dart' as _i6;
-import 'todo.dart' as _i7;
-import 'user.dart' as _i8;
-import 'package:shared/shared.dart' as _i9;
+import 'profile_images.dart' as _i6;
+import 'secrets.dart' as _i7;
+import 'todo.dart' as _i8;
+import 'user.dart' as _i9;
+import 'package:shared/shared.dart' as _i10;
 export 'app_exception.dart';
 export 'error_type.dart';
 export 'example.dart';
+export 'profile_images.dart';
 export 'secrets.dart';
 export 'todo.dart';
 export 'user.dart';
@@ -33,6 +35,71 @@ class Protocol extends _i1.SerializationManagerServer {
   static final Protocol _instance = Protocol._();
 
   static final targetDatabaseDefinition = _i2.DatabaseDefinition(tables: [
+    _i2.TableDefinition(
+      name: 'profile_images',
+      schema: 'public',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.integer,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'profile_images_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'userId',
+          columnType: _i2.ColumnType.integer,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'avatar',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'avatarThumbnail',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'cover',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+      ],
+      foreignKeys: [
+        _i2.ForeignKeyDefinition(
+          constraintName: 'profile_images_fk_0',
+          columns: ['userId'],
+          referenceTable: 'users',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: null,
+          onDelete: _i2.ForeignKeyAction.cascade,
+          matchType: null,
+        )
+      ],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'profile_images_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
+      ],
+      managed: true,
+    ),
     _i2.TableDefinition(
       name: 'secrets',
       schema: 'public',
@@ -199,14 +266,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i5.Example) {
       return _i5.Example.fromJson(data, this) as T;
     }
-    if (t == _i6.Secret) {
-      return _i6.Secret.fromJson(data, this) as T;
+    if (t == _i6.ProfileImages) {
+      return _i6.ProfileImages.fromJson(data, this) as T;
     }
-    if (t == _i7.Todo) {
-      return _i7.Todo.fromJson(data, this) as T;
+    if (t == _i7.Secret) {
+      return _i7.Secret.fromJson(data, this) as T;
     }
-    if (t == _i8.User) {
-      return _i8.User.fromJson(data, this) as T;
+    if (t == _i8.Todo) {
+      return _i8.Todo.fromJson(data, this) as T;
+    }
+    if (t == _i9.User) {
+      return _i9.User.fromJson(data, this) as T;
     }
     if (t == _i1.getType<_i3.AppException?>()) {
       return (data != null ? _i3.AppException.fromJson(data, this) : null) as T;
@@ -217,25 +287,29 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i5.Example?>()) {
       return (data != null ? _i5.Example.fromJson(data, this) : null) as T;
     }
-    if (t == _i1.getType<_i6.Secret?>()) {
-      return (data != null ? _i6.Secret.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<_i6.ProfileImages?>()) {
+      return (data != null ? _i6.ProfileImages.fromJson(data, this) : null)
+          as T;
     }
-    if (t == _i1.getType<_i7.Todo?>()) {
-      return (data != null ? _i7.Todo.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<_i7.Secret?>()) {
+      return (data != null ? _i7.Secret.fromJson(data, this) : null) as T;
     }
-    if (t == _i1.getType<_i8.User?>()) {
-      return (data != null ? _i8.User.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<_i8.Todo?>()) {
+      return (data != null ? _i8.Todo.fromJson(data, this) : null) as T;
+    }
+    if (t == _i1.getType<_i9.User?>()) {
+      return (data != null ? _i9.User.fromJson(data, this) : null) as T;
     }
     if (t == _i1.getType<List<String>?>()) {
       return (data != null
           ? (data as List).map((e) => deserialize<String>(e)).toList()
           : null) as dynamic;
     }
-    if (t == _i9.Car) {
-      return _i9.Car.fromJson(data, this) as T;
+    if (t == _i10.Car) {
+      return _i10.Car.fromJson(data, this) as T;
     }
-    if (t == _i1.getType<_i9.Car?>()) {
-      return (data != null ? _i9.Car.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<_i10.Car?>()) {
+      return (data != null ? _i10.Car.fromJson(data, this) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -245,7 +319,7 @@ class Protocol extends _i1.SerializationManagerServer {
 
   @override
   String? getClassNameForObject(Object data) {
-    if (data is _i9.Car) {
+    if (data is _i10.Car) {
       return 'Car';
     }
     if (data is _i3.AppException) {
@@ -257,13 +331,16 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i5.Example) {
       return 'Example';
     }
-    if (data is _i6.Secret) {
+    if (data is _i6.ProfileImages) {
+      return 'ProfileImages';
+    }
+    if (data is _i7.Secret) {
       return 'Secret';
     }
-    if (data is _i7.Todo) {
+    if (data is _i8.Todo) {
       return 'Todo';
     }
-    if (data is _i8.User) {
+    if (data is _i9.User) {
       return 'User';
     }
     return super.getClassNameForObject(data);
@@ -272,7 +349,7 @@ class Protocol extends _i1.SerializationManagerServer {
   @override
   dynamic deserializeByClassName(Map<String, dynamic> data) {
     if (data['className'] == 'Car') {
-      return deserialize<_i9.Car>(data['data']);
+      return deserialize<_i10.Car>(data['data']);
     }
     if (data['className'] == 'AppException') {
       return deserialize<_i3.AppException>(data['data']);
@@ -283,14 +360,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data['className'] == 'Example') {
       return deserialize<_i5.Example>(data['data']);
     }
+    if (data['className'] == 'ProfileImages') {
+      return deserialize<_i6.ProfileImages>(data['data']);
+    }
     if (data['className'] == 'Secret') {
-      return deserialize<_i6.Secret>(data['data']);
+      return deserialize<_i7.Secret>(data['data']);
     }
     if (data['className'] == 'Todo') {
-      return deserialize<_i7.Todo>(data['data']);
+      return deserialize<_i8.Todo>(data['data']);
     }
     if (data['className'] == 'User') {
-      return deserialize<_i8.User>(data['data']);
+      return deserialize<_i9.User>(data['data']);
     }
     return super.deserializeByClassName(data);
   }
@@ -304,12 +384,14 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
     switch (t) {
-      case _i6.Secret:
-        return _i6.Secret.t;
-      case _i7.Todo:
-        return _i7.Todo.t;
-      case _i8.User:
-        return _i8.User.t;
+      case _i6.ProfileImages:
+        return _i6.ProfileImages.t;
+      case _i7.Secret:
+        return _i7.Secret.t;
+      case _i8.Todo:
+        return _i8.Todo.t;
+      case _i9.User:
+        return _i9.User.t;
     }
     return null;
   }

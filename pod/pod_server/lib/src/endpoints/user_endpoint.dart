@@ -11,4 +11,20 @@ class UserEndpoint extends Endpoint {
       type: ErrorType.oops,
     );
   }
+
+  Future<User> createUser(Session session, String username) async {
+    final user = User(
+      username: username,
+      password: 'not how we do this',
+      preferences: ['cats', 'dogs', 'rainbows'],
+    );
+
+    await User.insert(session, user);
+
+    final profileImages = ProfileImages(userId: user.id!);
+
+    ProfileImages.insert(session, profileImages);
+
+    return user..profileImages = profileImages;
+  }
 }

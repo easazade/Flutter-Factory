@@ -43,3 +43,24 @@ ALTER TABLE ONLY "users"
 CREATE INDEX username_idx ON "users" USING btree ("username");
 
 
+--
+-- Class ProfileImages as table profile_images
+--
+
+CREATE TABLE "profile_images" (
+  "id" serial,
+  "userId" integer NOT NULL,
+  "avatar" text,
+  "avatarThumbnail" text,
+  "cover" text
+);
+
+ALTER TABLE ONLY "profile_images"
+  ADD CONSTRAINT profile_images_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY "profile_images"
+  ADD CONSTRAINT profile_images_fk_0
+    FOREIGN KEY("userId")
+      REFERENCES users(id)
+        ON DELETE CASCADE;
+

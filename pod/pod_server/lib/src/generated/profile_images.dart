@@ -7,53 +7,53 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import 'protocol.dart' as _i2;
 
-class User extends _i1.TableRow {
-  User({
+class ProfileImages extends _i1.TableRow {
+  ProfileImages({
     int? id,
-    required this.username,
-    this.password,
-    this.profileImages,
-    this.preferences,
+    required this.userId,
+    this.avatar,
+    this.avatarThumbnail,
+    this.cover,
   }) : super(id);
 
-  factory User.fromJson(
+  factory ProfileImages.fromJson(
     Map<String, dynamic> jsonSerialization,
     _i1.SerializationManager serializationManager,
   ) {
-    return User(
+    return ProfileImages(
       id: serializationManager.deserialize<int?>(jsonSerialization['id']),
-      username: serializationManager
-          .deserialize<String>(jsonSerialization['username']),
-      password: serializationManager
-          .deserialize<String?>(jsonSerialization['password']),
-      profileImages: serializationManager
-          .deserialize<_i2.ProfileImages?>(jsonSerialization['profileImages']),
-      preferences: serializationManager
-          .deserialize<List<String>?>(jsonSerialization['preferences']),
+      userId:
+          serializationManager.deserialize<int>(jsonSerialization['userId']),
+      avatar: serializationManager
+          .deserialize<String?>(jsonSerialization['avatar']),
+      avatarThumbnail: serializationManager
+          .deserialize<String?>(jsonSerialization['avatarThumbnail']),
+      cover:
+          serializationManager.deserialize<String?>(jsonSerialization['cover']),
     );
   }
 
-  static final t = UserTable();
+  static final t = ProfileImagesTable();
 
-  String username;
+  int userId;
 
-  String? password;
+  String? avatar;
 
-  _i2.ProfileImages? profileImages;
+  String? avatarThumbnail;
 
-  List<String>? preferences;
+  String? cover;
 
   @override
-  String get tableName => 'users';
+  String get tableName => 'profile_images';
   @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'username': username,
-      'profileImages': profileImages,
-      'preferences': preferences,
+      'userId': userId,
+      'avatar': avatar,
+      'avatarThumbnail': avatarThumbnail,
+      'cover': cover,
     };
   }
 
@@ -61,8 +61,10 @@ class User extends _i1.TableRow {
   Map<String, dynamic> toJsonForDatabase() {
     return {
       'id': id,
-      'username': username,
-      'password': password,
+      'userId': userId,
+      'avatar': avatar,
+      'avatarThumbnail': avatarThumbnail,
+      'cover': cover,
     };
   }
 
@@ -70,10 +72,10 @@ class User extends _i1.TableRow {
   Map<String, dynamic> allToJson() {
     return {
       'id': id,
-      'username': username,
-      'password': password,
-      'profileImages': profileImages,
-      'preferences': preferences,
+      'userId': userId,
+      'avatar': avatar,
+      'avatarThumbnail': avatarThumbnail,
+      'cover': cover,
     };
   }
 
@@ -86,20 +88,26 @@ class User extends _i1.TableRow {
       case 'id':
         id = value;
         return;
-      case 'username':
-        username = value;
+      case 'userId':
+        userId = value;
         return;
-      case 'password':
-        password = value;
+      case 'avatar':
+        avatar = value;
+        return;
+      case 'avatarThumbnail':
+        avatarThumbnail = value;
+        return;
+      case 'cover':
+        cover = value;
         return;
       default:
         throw UnimplementedError();
     }
   }
 
-  static Future<List<User>> find(
+  static Future<List<ProfileImages>> find(
     _i1.Session session, {
-    UserExpressionBuilder? where,
+    ProfileImagesExpressionBuilder? where,
     int? limit,
     int? offset,
     _i1.Column? orderBy,
@@ -108,8 +116,8 @@ class User extends _i1.TableRow {
     bool useCache = true,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.find<User>(
-      where: where != null ? where(User.t) : null,
+    return session.db.find<ProfileImages>(
+      where: where != null ? where(ProfileImages.t) : null,
       limit: limit,
       offset: offset,
       orderBy: orderBy,
@@ -120,17 +128,17 @@ class User extends _i1.TableRow {
     );
   }
 
-  static Future<User?> findSingleRow(
+  static Future<ProfileImages?> findSingleRow(
     _i1.Session session, {
-    UserExpressionBuilder? where,
+    ProfileImagesExpressionBuilder? where,
     int? offset,
     _i1.Column? orderBy,
     bool orderDescending = false,
     bool useCache = true,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.findSingleRow<User>(
-      where: where != null ? where(User.t) : null,
+    return session.db.findSingleRow<ProfileImages>(
+      where: where != null ? where(ProfileImages.t) : null,
       offset: offset,
       orderBy: orderBy,
       orderDescending: orderDescending,
@@ -139,27 +147,27 @@ class User extends _i1.TableRow {
     );
   }
 
-  static Future<User?> findById(
+  static Future<ProfileImages?> findById(
     _i1.Session session,
     int id,
   ) async {
-    return session.db.findById<User>(id);
+    return session.db.findById<ProfileImages>(id);
   }
 
   static Future<int> delete(
     _i1.Session session, {
-    required UserExpressionBuilder where,
+    required ProfileImagesExpressionBuilder where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.delete<User>(
-      where: where(User.t),
+    return session.db.delete<ProfileImages>(
+      where: where(ProfileImages.t),
       transaction: transaction,
     );
   }
 
   static Future<bool> deleteRow(
     _i1.Session session,
-    User row, {
+    ProfileImages row, {
     _i1.Transaction? transaction,
   }) async {
     return session.db.deleteRow(
@@ -170,7 +178,7 @@ class User extends _i1.TableRow {
 
   static Future<bool> update(
     _i1.Session session,
-    User row, {
+    ProfileImages row, {
     _i1.Transaction? transaction,
   }) async {
     return session.db.update(
@@ -181,7 +189,7 @@ class User extends _i1.TableRow {
 
   static Future<void> insert(
     _i1.Session session,
-    User row, {
+    ProfileImages row, {
     _i1.Transaction? transaction,
   }) async {
     return session.db.insert(
@@ -192,13 +200,13 @@ class User extends _i1.TableRow {
 
   static Future<int> count(
     _i1.Session session, {
-    UserExpressionBuilder? where,
+    ProfileImagesExpressionBuilder? where,
     int? limit,
     bool useCache = true,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<User>(
-      where: where != null ? where(User.t) : null,
+    return session.db.count<ProfileImages>(
+      where: where != null ? where(ProfileImages.t) : null,
       limit: limit,
       useCache: useCache,
       transaction: transaction,
@@ -206,27 +214,34 @@ class User extends _i1.TableRow {
   }
 }
 
-typedef UserExpressionBuilder = _i1.Expression Function(UserTable);
+typedef ProfileImagesExpressionBuilder = _i1.Expression Function(
+    ProfileImagesTable);
 
-class UserTable extends _i1.Table {
-  UserTable() : super(tableName: 'users');
+class ProfileImagesTable extends _i1.Table {
+  ProfileImagesTable() : super(tableName: 'profile_images');
 
   /// The database id, set if the object has been inserted into the
   /// database or if it has been fetched from the database. Otherwise,
   /// the id will be null.
   final id = _i1.ColumnInt('id');
 
-  final username = _i1.ColumnString('username');
+  final userId = _i1.ColumnInt('userId');
 
-  final password = _i1.ColumnString('password');
+  final avatar = _i1.ColumnString('avatar');
+
+  final avatarThumbnail = _i1.ColumnString('avatarThumbnail');
+
+  final cover = _i1.ColumnString('cover');
 
   @override
   List<_i1.Column> get columns => [
         id,
-        username,
-        password,
+        userId,
+        avatar,
+        avatarThumbnail,
+        cover,
       ];
 }
 
-@Deprecated('Use UserTable.t instead.')
-UserTable tUser = UserTable();
+@Deprecated('Use ProfileImagesTable.t instead.')
+ProfileImagesTable tProfileImages = ProfileImagesTable();

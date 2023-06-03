@@ -4,6 +4,7 @@ table: users
 fields:
   username: String
   password: String?, database
+  profileImages: ProfileImages?, api
   preferences: List<String>?, api
 
 indexes:

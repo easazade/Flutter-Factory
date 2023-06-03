@@ -67,3 +67,10 @@ there is a `Serverpod.instance` that has some nifty functionalities.
 
 for example we can use `createSession` to create one manually (which we are responsible for closing it manually as well).
 `session.close()`. If we don't it will cause memory leaks.
+
+# Database
+
+we can define parent child relationship between tables, so when a parent row gets deleted and hence
+its children make no more sense to exist, they (children) will be deleted as well.
+
+cehck out user.yaml protocl

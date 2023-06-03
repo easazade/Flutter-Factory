@@ -1,0 +1,8 @@
+class: ProfileImages
+table: profile_images
+
+fields:
+  userId: int, parent=users
+  avatar: String?
+  avatarThumbnail: String?
+  cover: String?

@@ -7,28 +7,30 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'protocol.dart' as _i2;
 
-class User extends _i1.SerializableEntity {
-  User({
+class ProfileImages extends _i1.SerializableEntity {
+  ProfileImages({
     this.id,
-    required this.username,
-    this.profileImages,
-    this.preferences,
+    required this.userId,
+    this.avatar,
+    this.avatarThumbnail,
+    this.cover,
   });
 
-  factory User.fromJson(
+  factory ProfileImages.fromJson(
     Map<String, dynamic> jsonSerialization,
     _i1.SerializationManager serializationManager,
   ) {
-    return User(
+    return ProfileImages(
       id: serializationManager.deserialize<int?>(jsonSerialization['id']),
-      username: serializationManager
-          .deserialize<String>(jsonSerialization['username']),
-      profileImages: serializationManager
-          .deserialize<_i2.ProfileImages?>(jsonSerialization['profileImages']),
-      preferences: serializationManager
-          .deserialize<List<String>?>(jsonSerialization['preferences']),
+      userId:
+          serializationManager.deserialize<int>(jsonSerialization['userId']),
+      avatar: serializationManager
+          .deserialize<String?>(jsonSerialization['avatar']),
+      avatarThumbnail: serializationManager
+          .deserialize<String?>(jsonSerialization['avatarThumbnail']),
+      cover:
+          serializationManager.deserialize<String?>(jsonSerialization['cover']),
     );
   }
 
@@ -37,19 +39,22 @@ class User extends _i1.SerializableEntity {
   /// the id will be null.
   int? id;
 
-  String username;
+  int userId;
 
-  _i2.ProfileImages? profileImages;
+  String? avatar;
 
-  List<String>? preferences;
+  String? avatarThumbnail;
+
+  String? cover;
 
   @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'username': username,
-      'profileImages': profileImages,
-      'preferences': preferences,
+      'userId': userId,
+      'avatar': avatar,
+      'avatarThumbnail': avatarThumbnail,
+      'cover': cover,
     };
   }
 }

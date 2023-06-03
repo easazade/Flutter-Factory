@@ -148,7 +148,25 @@ class Endpoints extends _i1.EndpointDispatch {
             session,
             params['name'],
           ),
-        )
+        ),
+        'createUser': _i1.MethodConnector(
+          name: 'createUser',
+          params: {
+            'username': _i1.ParameterDescription(
+              name: 'username',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['user'] as _i6.UserEndpoint).createUser(
+            session,
+            params['username'],
+          ),
+        ),
       },
     );
   }

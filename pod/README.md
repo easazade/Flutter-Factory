@@ -70,7 +70,12 @@ for example we can use `createSession` to create one manually (which we are resp
 
 # Database
 
+protocols define different serializable classes mdoels, exceptions, enums
+if we add the table field to the protocol it will generate its database stuff as well. if not it will
+only generate a serializable class.
+
 we can define parent child relationship between tables, so when a parent row gets deleted and hence
 its children make no more sense to exist, they (children) will be deleted as well.
-
 cehck out user.yaml protocl
+
+complete doc on entities and database => https://docs.serverpod.dev/concepts/database-communication

@@ -13,6 +13,8 @@ class UserEndpoint extends Endpoint {
   }
 
   Future<User> createUser(Session session, String username) async {
+    // ideally we want to do this in a transaction using session.db.transaction
+
     final user = User(
       username: username,
       password: 'not how we do this',

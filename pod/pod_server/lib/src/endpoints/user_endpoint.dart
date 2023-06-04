@@ -12,6 +12,25 @@ class UserEndpoint extends Endpoint {
     );
   }
 
+  Future<User?> getUserById(Session session, int id) async {
+    final cacheKey = 'User-$id';
+
+    var user = await session.caches.local.get<User>(cacheKey);
+
+    if (user == null) {
+      user = await session.db.findById<User>(id);
+      if (user != null) {
+        final profileImages = await ProfileImages.findSingleRow(session, where: (t) => t.userId.equals(id));
+        user.profileImages = profileImages;
+        await session.caches.local.put(cacheKey, user);
+      } else {
+        throw AppException(message: 'Could not find user with $id', type: ErrorType.wtf);
+      }
+    }
+
+    return user;
+  }
+
   Future<User> createUser(Session session, String username) async {
     // ideally we want to do this in a transaction using session.db.transaction
 

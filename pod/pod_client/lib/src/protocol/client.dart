@@ -79,6 +79,13 @@ class _EndpointUser extends _i1.EndpointRef {
         {'name': name},
       );
 
+  _i2.Future<_i5.User?> getUserById(int id) =>
+      caller.callServerEndpoint<_i5.User?>(
+        'user',
+        'getUserById',
+        {'id': id},
+      );
+
   _i2.Future<_i5.User> createUser(String username) =>
       caller.callServerEndpoint<_i5.User>(
         'user',

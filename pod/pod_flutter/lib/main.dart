@@ -45,6 +45,7 @@ class MyHomePageState extends State<MyHomePage> {
   String? _userResult;
   String? _createUserResult;
   String? _errorMessage;
+  String? _findUserByIdResult;
 
   final _textEditingController = TextEditingController();
 
@@ -57,6 +58,7 @@ class MyHomePageState extends State<MyHomePage> {
       final result = await client.todo.createTodo(todo);
       final carResult = await client.car.getCar();
       final createUserResult = await client.user.createUser(_textEditingController.text);
+      final findUserResult = await client.user.getUserById(createUserResult.id!);
 
       try {
         _userResult = await client.user.user('name');
@@ -68,6 +70,7 @@ class MyHomePageState extends State<MyHomePage> {
         _resultMessage = jsonEncode(result.toJson());
         _carResultMessage = carResult.name;
         _createUserResult = 'created a user => ${jsonEncode(createUserResult)}';
+        _findUserByIdResult = 'found this user $findUserResult';
       });
     } catch (e, _) {
       setState(() {
@@ -120,6 +123,10 @@ class MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 20),
             _ResultDisplay(
               resultMessage: _createUserResult,
+            ),
+            const SizedBox(height: 20),
+            _ResultDisplay(
+              resultMessage: _findUserByIdResult,
             ),
           ],
         ),

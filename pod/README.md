@@ -70,6 +70,9 @@ for example we can use `createSession` to create one manually (which we are resp
 
 # Database
 
+to connect to postgres databse in docker run
+`docker exec -it pod_server-postgres-1 psql -U postgres`
+
 protocols define different serializable classes mdoels, exceptions, enums
 if we add the table field to the protocol it will generate its database stuff as well. if not it will
 only generate a serializable class.

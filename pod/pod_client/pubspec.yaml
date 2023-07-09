@@ -8,3 +8,4 @@ dependencies:
   serverpod_client: ^1.1.1
   shared:
     path: ../shared
+  serverpod_auth_client: ^1.1.1  

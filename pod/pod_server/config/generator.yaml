@@ -4,3 +4,7 @@ client_package_path: ../pod_client
 
 extraClasses:
   - package:shared/shared.dart:Car
+
+modules:
+  serverpod_auth:
+    nickname: auth

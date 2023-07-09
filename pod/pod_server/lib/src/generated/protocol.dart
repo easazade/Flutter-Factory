@@ -9,14 +9,15 @@ library protocol; // ignore_for_file: no_leading_underscores_for_library_prefixe
 
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
-import 'app_exception.dart' as _i3;
-import 'error_type.dart' as _i4;
-import 'example.dart' as _i5;
-import 'profile_images.dart' as _i6;
-import 'secrets.dart' as _i7;
-import 'todo.dart' as _i8;
-import 'user.dart' as _i9;
-import 'package:shared/shared.dart' as _i10;
+import 'package:serverpod_auth_server/module.dart' as _i3;
+import 'app_exception.dart' as _i4;
+import 'error_type.dart' as _i5;
+import 'example.dart' as _i6;
+import 'profile_images.dart' as _i7;
+import 'secrets.dart' as _i8;
+import 'todo.dart' as _i9;
+import 'user.dart' as _i10;
+import 'package:shared/shared.dart' as _i11;
 export 'app_exception.dart';
 export 'error_type.dart';
 export 'example.dart';
@@ -245,6 +246,7 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
+    ..._i3.Protocol.targetDatabaseDefinition.tables,
     ..._i2.Protocol.targetDatabaseDefinition.tables,
   ]);
 
@@ -257,60 +259,67 @@ class Protocol extends _i1.SerializationManagerServer {
     if (customConstructors.containsKey(t)) {
       return customConstructors[t]!(data, this) as T;
     }
-    if (t == _i3.AppException) {
-      return _i3.AppException.fromJson(data, this) as T;
+    if (t == _i4.AppException) {
+      return _i4.AppException.fromJson(data, this) as T;
     }
-    if (t == _i4.ErrorType) {
-      return _i4.ErrorType.fromJson(data) as T;
+    if (t == _i5.ErrorType) {
+      return _i5.ErrorType.fromJson(data) as T;
     }
-    if (t == _i5.Example) {
-      return _i5.Example.fromJson(data, this) as T;
+    if (t == _i6.Example) {
+      return _i6.Example.fromJson(data, this) as T;
     }
-    if (t == _i6.ProfileImages) {
-      return _i6.ProfileImages.fromJson(data, this) as T;
+    if (t == _i7.ProfileImages) {
+      return _i7.ProfileImages.fromJson(data, this) as T;
     }
-    if (t == _i7.Secret) {
-      return _i7.Secret.fromJson(data, this) as T;
+    if (t == _i8.Secret) {
+      return _i8.Secret.fromJson(data, this) as T;
     }
-    if (t == _i8.Todo) {
-      return _i8.Todo.fromJson(data, this) as T;
+    if (t == _i9.Todo) {
+      return _i9.Todo.fromJson(data, this) as T;
     }
-    if (t == _i9.User) {
-      return _i9.User.fromJson(data, this) as T;
+    if (t == _i10.User) {
+      return _i10.User.fromJson(data, this) as T;
     }
-    if (t == _i1.getType<_i3.AppException?>()) {
-      return (data != null ? _i3.AppException.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<_i4.AppException?>()) {
+      return (data != null ? _i4.AppException.fromJson(data, this) : null) as T;
     }
-    if (t == _i1.getType<_i4.ErrorType?>()) {
-      return (data != null ? _i4.ErrorType.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i5.ErrorType?>()) {
+      return (data != null ? _i5.ErrorType.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i5.Example?>()) {
-      return (data != null ? _i5.Example.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<_i6.Example?>()) {
+      return (data != null ? _i6.Example.fromJson(data, this) : null) as T;
     }
-    if (t == _i1.getType<_i6.ProfileImages?>()) {
-      return (data != null ? _i6.ProfileImages.fromJson(data, this) : null)
+    if (t == _i1.getType<_i7.ProfileImages?>()) {
+      return (data != null ? _i7.ProfileImages.fromJson(data, this) : null)
           as T;
     }
-    if (t == _i1.getType<_i7.Secret?>()) {
-      return (data != null ? _i7.Secret.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<_i8.Secret?>()) {
+      return (data != null ? _i8.Secret.fromJson(data, this) : null) as T;
     }
-    if (t == _i1.getType<_i8.Todo?>()) {
-      return (data != null ? _i8.Todo.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<_i9.Todo?>()) {
+      return (data != null ? _i9.Todo.fromJson(data, this) : null) as T;
     }
-    if (t == _i1.getType<_i9.User?>()) {
-      return (data != null ? _i9.User.fromJson(data, this) : null) as T;
+    if (t == _i1.getType<_i10.User?>()) {
+      return (data != null ? _i10.User.fromJson(data, this) : null) as T;
     }
     if (t == _i1.getType<List<String>?>()) {
       return (data != null
           ? (data as List).map((e) => deserialize<String>(e)).toList()
           : null) as dynamic;
     }
-    if (t == _i10.Car) {
-      return _i10.Car.fromJson(data, this) as T;
+    if (t == Map<String, String>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<String>(v))) as dynamic;
     }
-    if (t == _i1.getType<_i10.Car?>()) {
-      return (data != null ? _i10.Car.fromJson(data, this) : null) as T;
+    if (t == _i11.Car) {
+      return _i11.Car.fromJson(data, this) as T;
     }
+    if (t == _i1.getType<_i11.Car?>()) {
+      return (data != null ? _i11.Car.fromJson(data, this) : null) as T;
+    }
+    try {
+      return _i3.Protocol().deserialize<T>(data, t);
+    } catch (_) {}
     try {
       return _i2.Protocol().deserialize<T>(data, t);
     } catch (_) {}
@@ -319,28 +328,33 @@ class Protocol extends _i1.SerializationManagerServer {
 
   @override
   String? getClassNameForObject(Object data) {
-    if (data is _i10.Car) {
+    String? className;
+    className = _i3.Protocol().getClassNameForObject(data);
+    if (className != null) {
+      return 'serverpod_auth.$className';
+    }
+    if (data is _i11.Car) {
       return 'Car';
     }
-    if (data is _i3.AppException) {
+    if (data is _i4.AppException) {
       return 'AppException';
     }
-    if (data is _i4.ErrorType) {
+    if (data is _i5.ErrorType) {
       return 'ErrorType';
     }
-    if (data is _i5.Example) {
+    if (data is _i6.Example) {
       return 'Example';
     }
-    if (data is _i6.ProfileImages) {
+    if (data is _i7.ProfileImages) {
       return 'ProfileImages';
     }
-    if (data is _i7.Secret) {
+    if (data is _i8.Secret) {
       return 'Secret';
     }
-    if (data is _i8.Todo) {
+    if (data is _i9.Todo) {
       return 'Todo';
     }
-    if (data is _i9.User) {
+    if (data is _i10.User) {
       return 'User';
     }
     return super.getClassNameForObject(data);
@@ -348,29 +362,33 @@ class Protocol extends _i1.SerializationManagerServer {
 
   @override
   dynamic deserializeByClassName(Map<String, dynamic> data) {
+    if (data['className'].startsWith('serverpod_auth.')) {
+      data['className'] = data['className'].substring(15);
+      return _i3.Protocol().deserializeByClassName(data);
+    }
     if (data['className'] == 'Car') {
-      return deserialize<_i10.Car>(data['data']);
+      return deserialize<_i11.Car>(data['data']);
     }
     if (data['className'] == 'AppException') {
-      return deserialize<_i3.AppException>(data['data']);
+      return deserialize<_i4.AppException>(data['data']);
     }
     if (data['className'] == 'ErrorType') {
-      return deserialize<_i4.ErrorType>(data['data']);
+      return deserialize<_i5.ErrorType>(data['data']);
     }
     if (data['className'] == 'Example') {
-      return deserialize<_i5.Example>(data['data']);
+      return deserialize<_i6.Example>(data['data']);
     }
     if (data['className'] == 'ProfileImages') {
-      return deserialize<_i6.ProfileImages>(data['data']);
+      return deserialize<_i7.ProfileImages>(data['data']);
     }
     if (data['className'] == 'Secret') {
-      return deserialize<_i7.Secret>(data['data']);
+      return deserialize<_i8.Secret>(data['data']);
     }
     if (data['className'] == 'Todo') {
-      return deserialize<_i8.Todo>(data['data']);
+      return deserialize<_i9.Todo>(data['data']);
     }
     if (data['className'] == 'User') {
-      return deserialize<_i9.User>(data['data']);
+      return deserialize<_i10.User>(data['data']);
     }
     return super.deserializeByClassName(data);
   }
@@ -378,20 +396,26 @@ class Protocol extends _i1.SerializationManagerServer {
   @override
   _i1.Table? getTableForType(Type t) {
     {
+      var table = _i3.Protocol().getTableForType(t);
+      if (table != null) {
+        return table;
+      }
+    }
+    {
       var table = _i2.Protocol().getTableForType(t);
       if (table != null) {
         return table;
       }
     }
     switch (t) {
-      case _i6.ProfileImages:
-        return _i6.ProfileImages.t;
-      case _i7.Secret:
-        return _i7.Secret.t;
-      case _i8.Todo:
-        return _i8.Todo.t;
-      case _i9.User:
-        return _i9.User.t;
+      case _i7.ProfileImages:
+        return _i7.ProfileImages.t;
+      case _i8.Secret:
+        return _i8.Secret.t;
+      case _i9.Todo:
+        return _i9.Todo.t;
+      case _i10.User:
+        return _i10.User.t;
     }
     return null;
   }

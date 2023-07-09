@@ -11,8 +11,9 @@ import 'dart:async' as _i2;
 import 'package:shared/src/shared_models/car.dart' as _i3;
 import 'package:pod_client/src/protocol/todo.dart' as _i4;
 import 'package:pod_client/src/protocol/user.dart' as _i5;
-import 'dart:io' as _i6;
-import 'protocol.dart' as _i7;
+import 'package:serverpod_auth_client/module.dart' as _i6;
+import 'dart:io' as _i7;
+import 'protocol.dart' as _i8;
 
 class _EndpointCar extends _i1.EndpointRef {
   _EndpointCar(_i1.EndpointCaller caller) : super(caller);
@@ -37,6 +38,20 @@ class _EndpointExample extends _i1.EndpointRef {
         'example',
         'hello',
         {'name': name},
+      );
+}
+
+class _EndpointPremium extends _i1.EndpointRef {
+  _EndpointPremium(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'premium';
+
+  _i2.Future<Map<String, String>> getPremiumData() =>
+      caller.callServerEndpoint<Map<String, String>>(
+        'premium',
+        'getPremiumData',
+        {},
       );
 }
 
@@ -94,27 +109,39 @@ class _EndpointUser extends _i1.EndpointRef {
       );
 }
 
+class _Modules {
+  _Modules(Client client) {
+    auth = _i6.Caller(client);
+  }
+
+  late final _i6.Caller auth;
+}
+
 class Client extends _i1.ServerpodClient {
   Client(
     String host, {
-    _i6.SecurityContext? context,
+    _i7.SecurityContext? context,
     _i1.AuthenticationKeyManager? authenticationKeyManager,
   }) : super(
           host,
-          _i7.Protocol(),
+          _i8.Protocol(),
           context: context,
           authenticationKeyManager: authenticationKeyManager,
         ) {
     car = _EndpointCar(this);
     example = _EndpointExample(this);
+    premium = _EndpointPremium(this);
     secrets = _EndpointSecrets(this);
     todo = _EndpointTodo(this);
     user = _EndpointUser(this);
+    modules = _Modules(this);
   }
 
   late final _EndpointCar car;
 
   late final _EndpointExample example;
+
+  late final _EndpointPremium premium;
 
   late final _EndpointSecrets secrets;
 
@@ -122,14 +149,18 @@ class Client extends _i1.ServerpodClient {
 
   late final _EndpointUser user;
 
+  late final _Modules modules;
+
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'car': car,
         'example': example,
+        'premium': premium,
         'secrets': secrets,
         'todo': todo,
         'user': user,
       };
   @override
-  Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {};
+  Map<String, _i1.ModuleEndpointCaller> get moduleLookup =>
+      {'auth': modules.auth};
 }

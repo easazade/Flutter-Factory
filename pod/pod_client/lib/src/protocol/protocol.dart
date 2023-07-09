@@ -15,6 +15,7 @@ import 'profile_images.dart' as _i5;
 import 'todo.dart' as _i6;
 import 'user.dart' as _i7;
 import 'package:shared/shared.dart' as _i8;
+import 'package:serverpod_auth_client/module.dart' as _i9;
 export 'app_exception.dart';
 export 'error_type.dart';
 export 'example.dart';
@@ -83,17 +84,29 @@ class Protocol extends _i1.SerializationManager {
           ? (data as List).map((e) => deserialize<String>(e)).toList()
           : null) as dynamic;
     }
+    if (t == Map<String, String>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<String>(v))) as dynamic;
+    }
     if (t == _i8.Car) {
       return _i8.Car.fromJson(data, this) as T;
     }
     if (t == _i1.getType<_i8.Car?>()) {
       return (data != null ? _i8.Car.fromJson(data, this) : null) as T;
     }
+    try {
+      return _i9.Protocol().deserialize<T>(data, t);
+    } catch (_) {}
     return super.deserialize<T>(data, t);
   }
 
   @override
   String? getClassNameForObject(Object data) {
+    String? className;
+    className = _i9.Protocol().getClassNameForObject(data);
+    if (className != null) {
+      return 'serverpod_auth.$className';
+    }
     if (data is _i8.Car) {
       return 'Car';
     }
@@ -120,6 +133,10 @@ class Protocol extends _i1.SerializationManager {
 
   @override
   dynamic deserializeByClassName(Map<String, dynamic> data) {
+    if (data['className'].startsWith('serverpod_auth.')) {
+      data['className'] = data['className'].substring(15);
+      return _i9.Protocol().deserializeByClassName(data);
+    }
     if (data['className'] == 'Car') {
       return deserialize<_i8.Car>(data['data']);
     }

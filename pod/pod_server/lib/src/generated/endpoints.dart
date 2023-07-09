@@ -9,10 +9,12 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../endpoints/car_endpoint.dart' as _i2;
 import '../endpoints/example_endpoint.dart' as _i3;
-import '../endpoints/secrets_endpoint.dart' as _i4;
-import '../endpoints/todo_endpoint.dart' as _i5;
-import '../endpoints/user_endpoint.dart' as _i6;
-import 'package:pod_server/src/generated/todo.dart' as _i7;
+import '../endpoints/premium_endpoint.dart' as _i4;
+import '../endpoints/secrets_endpoint.dart' as _i5;
+import '../endpoints/todo_endpoint.dart' as _i6;
+import '../endpoints/user_endpoint.dart' as _i7;
+import 'package:pod_server/src/generated/todo.dart' as _i8;
+import 'package:serverpod_auth_server/module.dart' as _i9;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -30,19 +32,25 @@ class Endpoints extends _i1.EndpointDispatch {
           'example',
           null,
         ),
-      'secrets': _i4.SecretsEndpoint()
+      'premium': _i4.PremiumEndpoint()
+        ..initialize(
+          server,
+          'premium',
+          null,
+        ),
+      'secrets': _i5.SecretsEndpoint()
         ..initialize(
           server,
           'secrets',
           null,
         ),
-      'todo': _i5.TodoEndpoint()
+      'todo': _i6.TodoEndpoint()
         ..initialize(
           server,
           'todo',
           null,
         ),
-      'user': _i6.UserEndpoint()
+      'user': _i7.UserEndpoint()
         ..initialize(
           server,
           'user',
@@ -88,6 +96,22 @@ class Endpoints extends _i1.EndpointDispatch {
         )
       },
     );
+    connectors['premium'] = _i1.EndpointConnector(
+      name: 'premium',
+      endpoint: endpoints['premium']!,
+      methodConnectors: {
+        'getPremiumData': _i1.MethodConnector(
+          name: 'getPremiumData',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['premium'] as _i4.PremiumEndpoint)
+                  .getPremiumData(session),
+        )
+      },
+    );
     connectors['secrets'] = _i1.EndpointConnector(
       name: 'secrets',
       endpoint: endpoints['secrets']!,
@@ -99,7 +123,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['secrets'] as _i4.SecretsEndpoint).getSecret(session),
+              (endpoints['secrets'] as _i5.SecretsEndpoint).getSecret(session),
         )
       },
     );
@@ -112,7 +136,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'todo': _i1.ParameterDescription(
               name: 'todo',
-              type: _i1.getType<_i7.Todo>(),
+              type: _i1.getType<_i8.Todo>(),
               nullable: false,
             )
           },
@@ -120,7 +144,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['todo'] as _i5.TodoEndpoint).createTodo(
+              (endpoints['todo'] as _i6.TodoEndpoint).createTodo(
             session,
             params['todo'],
           ),
@@ -144,7 +168,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['user'] as _i6.UserEndpoint).user(
+              (endpoints['user'] as _i7.UserEndpoint).user(
             session,
             params['name'],
           ),
@@ -162,7 +186,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['user'] as _i6.UserEndpoint).getUserById(
+              (endpoints['user'] as _i7.UserEndpoint).getUserById(
             session,
             params['id'],
           ),
@@ -180,12 +204,13 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['user'] as _i6.UserEndpoint).createUser(
+              (endpoints['user'] as _i7.UserEndpoint).createUser(
             session,
             params['username'],
           ),
         ),
       },
     );
+    modules['serverpod_auth'] = _i9.Endpoints()..initializeEndpoints(server);
   }
 }

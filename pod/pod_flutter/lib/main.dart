@@ -1,7 +1,8 @@
-import 'dart:convert';
-
 import 'package:pod_client/pod_client.dart';
 import 'package:flutter/material.dart';
+import 'package:pod_flutter/pages/general_page.dart';
+import 'package:pod_flutter/pages/premium_page.dart';
+import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 
 // Sets up a singleton client object that can be used to talk to the server from
@@ -9,9 +10,21 @@ import 'package:serverpod_flutter/serverpod_flutter.dart';
 // The client is set up to connect to a Serverpod running on a local server on
 // the default port. You will need to modify this to connect to staging or
 // production servers.
-var client = Client('http://localhost:8080/')..connectivityMonitor = FlutterConnectivityMonitor();
+late Client client;
+late SessionManager sessionManager;
 
-void main() => runApp(const MyApp());
+Future main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+
+  client = Client(
+    'http://localhost:8080/',
+    authenticationKeyManager: FlutterAuthenticationKeyManager(),
+  )..connectivityMonitor = FlutterConnectivityMonitor();
+
+  sessionManager = SessionManager(caller: client.modules.auth);
+  await sessionManager.initialize();
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -23,150 +36,27 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Serverpod Example'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  MyHomePageState createState() => MyHomePageState();
-}
-
-class MyHomePageState extends State<MyHomePage> {
-  // These fields hold the last result or error message that we've received from
-  // the server or null if no result exists yet.
-  String? _resultMessage;
-  String? _carResultMessage;
-  String? _userResult;
-  String? _createUserResult;
-  String? _errorMessage;
-  String? _findUserByIdResult;
-
-  final _textEditingController = TextEditingController();
-
-  // Calls the `hello` method of the `example` endpoint. Will set either the
-  // `_resultMessage` or `_errorMessage` field, depending on if the call
-  // is successful.
-  void _sendRequest() async {
-    try {
-      final todo = Todo(name: _textEditingController.text, isDone: false);
-      final result = await client.todo.createTodo(todo);
-      final carResult = await client.car.getCar();
-      final createUserResult = await client.user.createUser(_textEditingController.text);
-      final findUserResult = await client.user.getUserById(createUserResult.id!);
-
-      try {
-        _userResult = await client.user.user('name');
-      } on AppException catch (e) {
-        _userResult = '${e.message} | ${e.type.name}';
-      }
-      setState(() {
-        _errorMessage = null;
-        _resultMessage = jsonEncode(result.toJson());
-        _carResultMessage = carResult.name;
-        _createUserResult = 'created a user => ${jsonEncode(createUserResult)}';
-        _findUserByIdResult = 'found this user $findUserResult';
-      });
-    } catch (e, _) {
-      setState(() {
-        _errorMessage = '$e';
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: TextField(
-                controller: _textEditingController,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your name',
+      home: Builder(builder: (context) {
+        return Material(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(
+                  child: const Text('General Page'),
+                  onPressed: () =>
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const GeneralPage())),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.black),
+                ElevatedButton(
+                  child: const Text('Premium Page'),
+                  onPressed: () =>
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const PremiumPage())),
                 ),
-                onPressed: _sendRequest,
-                child: const Text('Send Request'),
-              ),
+              ],
             ),
-            _ResultDisplay(
-              resultMessage: _resultMessage,
-              errorMessage: _errorMessage,
-            ),
-            const SizedBox(height: 20),
-            _ResultDisplay(
-              resultMessage: _carResultMessage,
-            ),
-            const SizedBox(height: 20),
-            _ResultDisplay(
-              resultMessage: _userResult,
-            ),
-            const SizedBox(height: 20),
-            _ResultDisplay(
-              resultMessage: _createUserResult,
-            ),
-            const SizedBox(height: 20),
-            _ResultDisplay(
-              resultMessage: _findUserByIdResult,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// _ResultDisplays shows the result of the call. Either the returned result from
-// the `example.hello` endpoint method or an error message.
-class _ResultDisplay extends StatelessWidget {
-  final String? resultMessage;
-  final String? errorMessage;
-
-  const _ResultDisplay({
-    this.resultMessage,
-    this.errorMessage,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    String text;
-    Color backgroundColor;
-    if (errorMessage != null) {
-      backgroundColor = Colors.red[300]!;
-      text = errorMessage!;
-    } else if (resultMessage != null) {
-      backgroundColor = Colors.green[300]!;
-      text = resultMessage!;
-    } else {
-      backgroundColor = Colors.grey[300]!;
-      text = 'No server response yet.';
-    }
-
-    return Container(
-      height: 50,
-      color: backgroundColor,
-      child: Center(
-        child: Text(text),
-      ),
+          ),
+        );
+      }),
     );
   }
 }

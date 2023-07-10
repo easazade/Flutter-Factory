@@ -42,18 +42,20 @@ void run(List<String> args) async {
   // Instead use a real email service provider, such as SendGrid, Mailjet or others.
   auth.AuthConfig.set(auth.AuthConfig(
     sendValidationEmail: (session, email, validationCode) async {
-      // Retrieve the credentials
-      final gmailEmail = session.serverpod.getPassword('gmailEmail')!;
-      final gmailPassword = session.serverpod.getPassword('gmailPassword')!;
-
       // Create a SMTP client for Gmail.
-      final smtpServer = gmail(gmailEmail, gmailPassword);
+      final smtpServer = SmtpServer(
+        'localhost',
+        port: 2500,
+        ssl: false,
+        allowInsecure: true,
+        ignoreBadCertificate: true,
+      );
       //FIXME: use below instead . best to use a token instead of gmail password
       // final smtpServer = gmailSaslXoauth2(gmailEmail, accessToken);
 
       // Create an email message with the validation code.
       final message = Message()
-        ..from = Address(gmailEmail)
+        ..from = Address('pod.project@gmail.com')
         ..recipients.add(email)
         ..subject = 'Verification code for Serverpod'
         ..html = 'Your verification code is: $validationCode';
@@ -61,26 +63,33 @@ void run(List<String> args) async {
       // Send the email message.
       try {
         await send(message, smtpServer);
-      } catch (_) {
-        // Return false if the email could not be sent.
+      } catch (e, stacktrace) {
+        session.log(
+          'Something went wrong when trying to send email',
+          level: LogLevel.error,
+          exception: e,
+          stackTrace: stacktrace,
+        );
         return false;
       }
 
       return true;
     },
     sendPasswordResetEmail: (session, userInfo, validationCode) async {
-      // Retrieve the credentials
-      final gmailEmail = session.serverpod.getPassword('gmailEmail')!;
-      final gmailPassword = session.serverpod.getPassword('gmailPassword')!;
-
       // Create a SMTP client for Gmail.
-      final smtpServer = gmail(gmailEmail, gmailPassword);
+      final smtpServer = SmtpServer(
+        'localhost',
+        port: 2500,
+        ssl: false,
+        allowInsecure: true,
+        ignoreBadCertificate: true,
+      );
       //FIXME: use below instead . best to use a token instead of gmail password
       // final smtpServer = gmailSaslXoauth2(gmailEmail, accessToken);
 
       // Create an email message with the password reset link.
       final message = Message()
-        ..from = Address(gmailEmail)
+        ..from = Address('pod.project@gmail.com')
         ..recipients.add(userInfo.email!)
         ..subject = 'Password reset link for Serverpod'
         ..html = 'Here is your password reset code: $validationCode>';
@@ -88,7 +97,13 @@ void run(List<String> args) async {
       // Send the email message.
       try {
         await send(message, smtpServer);
-      } catch (_) {
+      } catch (e, stacktrace) {
+        session.log(
+          'Something went wrong when trying to send email',
+          level: LogLevel.error,
+          exception: e,
+          stackTrace: stacktrace,
+        );
         // Return false if the email could not be sent.
         return false;
       }

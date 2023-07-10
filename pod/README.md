@@ -82,3 +82,11 @@ its children make no more sense to exist, they (children) will be deleted as wel
 cehck out user.yaml protocl
 
 complete doc on entities and database => https://docs.serverpod.dev/concepts/database-communication
+
+# Local SMTP server
+
+use mailslurper install it locally. go through the docs in its homepage its very easy to setup and config. make
+sure to change the panel port from 8080 to something else.
+
+mail address would be `localhost`
+check out pod_server/../server.dart to figure out how to create an instance of `SmtpServer` in dart

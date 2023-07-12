@@ -90,3 +90,5 @@ sure to change the panel port from 8080 to something else.
 
 mail address would be `localhost`
 check out pod_server/../server.dart to figure out how to create an instance of `SmtpServer` in dart
+to run mailslurper do this. open a terminal, go to directory of mailslurper and then can ./mailslurper
+WARNING: just double clicking it didn't work for me.

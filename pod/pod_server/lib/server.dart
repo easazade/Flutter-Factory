@@ -9,6 +9,30 @@ import 'src/generated/endpoints.dart';
 
 import 'package:serverpod_auth_server/module.dart' as auth;
 
+Future<List<ServerHealthMetric>> customHealthCheckHandler(Serverpod pod, DateTime timestamp) async {
+  // Actually perform some checks.
+  // Return a list of health metrics for the given timestamp.
+
+  return [
+    ServerHealthMetric(
+      name: 'awesomeness',
+      serverId: pod.serverId,
+      timestamp: timestamp,
+      isHealthy: true,
+      value: .55,
+      granularity: 1,
+    ),
+    ServerHealthMetric(
+      name: 'cats and dogs in my server',
+      serverId: pod.serverId,
+      timestamp: timestamp,
+      isHealthy: true,
+      value: .78,
+      granularity: 1,
+    ),
+  ];
+}
+
 // This is the starting point of your Serverpod server. In most cases, you will
 // only need to make additions to this file if you add future calls,  are
 // configuring Relic (Serverpod's web-server), or need custom setup work.
@@ -19,6 +43,7 @@ void run(List<String> args) async {
     args,
     Protocol(),
     Endpoints(),
+    healthCheckHandler: customHealthCheckHandler,
   );
 
   // If you are using any future calls, they need to be registered here.
@@ -50,8 +75,6 @@ void run(List<String> args) async {
         allowInsecure: true,
         ignoreBadCertificate: true,
       );
-      //FIXME: use below instead . best to use a token instead of gmail password
-      // final smtpServer = gmailSaslXoauth2(gmailEmail, accessToken);
 
       // Create an email message with the validation code.
       final message = Message()
@@ -84,8 +107,6 @@ void run(List<String> args) async {
         allowInsecure: true,
         ignoreBadCertificate: true,
       );
-      //FIXME: use below instead . best to use a token instead of gmail password
-      // final smtpServer = gmailSaslXoauth2(gmailEmail, accessToken);
 
       // Create an email message with the password reset link.
       final message = Message()

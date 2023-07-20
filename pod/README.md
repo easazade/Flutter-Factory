@@ -92,3 +92,10 @@ mail address would be `localhost`
 check out pod_server/../server.dart to figure out how to create an instance of `SmtpServer` in dart
 to run mailslurper do this. open a terminal, go to directory of mailslurper and then can ./mailslurper
 WARNING: just double clicking it didn't work for me.
+
+# Serverpod web server
+
+read webserver and widgets docs. there are pretty cool stuf there
+https://docs.serverpod.dev/concepts/webserver
+can be used to create web page, custom REST api and webhooks
+In addition to the application server, Serverpod comes with a built-in web server. The web server allows you to access your database and business layer the same way you would from a method call from an app. This makes it very easy to share data for applications that need both an app and traditional web pages. You can also use the web server to create webhooks or generate custom REST APIs to communicate with 3rd party services.

@@ -18,7 +18,8 @@ class _ThemeFromSeedPageState extends State<ThemeFromSeedPage> {
       child: Theme(
         data: Theme.of(context).copyWith(
           colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.teal,
+            seedColor: const Color(0xFFEF394F),
+            primary: const Color(0xFFEF394F),
             brightness: brightness,
             secondary: secondaryShades.main,
             onSecondary: secondaryShades.onMain,

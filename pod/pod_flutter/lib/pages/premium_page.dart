@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pod_flutter/main.dart';
 import 'package:pod_flutter/pages/general_page.dart';
@@ -128,34 +127,33 @@ class _PremiumPageState extends State<PremiumPage> {
                   child: const Text('Create Account'),
                 ),
               ),
-              // if (_sentVerificationCode)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.black),
-                  ),
-                  onPressed: () async {
-                    try {
-                      _errorMessage = null;
-                      ;
-                      final result = await emailController.validateAccount(
-                        _emailInputController.text,
-                        _verifyInputController.text,
-                      );
+              if (_sentVerificationCode)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.black),
+                    ),
+                    onPressed: () async {
+                      try {
+                        _errorMessage = null;
+                        final result = await emailController.validateAccount(
+                          _emailInputController.text,
+                          _verifyInputController.text,
+                        );
 
-                      final status = sessionManager.isSignedIn ? 'And is Signed In' : 'NOT Signed in';
-                      _resultMessage = 'VALIDATED ACCOUNT ✅: ${result?.email} - $status';
+                        final status = sessionManager.isSignedIn ? 'And is Signed In' : 'NOT Signed in';
+                        _resultMessage = 'VALIDATED ACCOUNT ✅: ${result?.email} - $status';
+                        if (mounted) setState(() {});
+                      } catch (e, stack) {
+                        print(e);
+                        print(stack);
+                      }
                       if (mounted) setState(() {});
-                    } catch (e, stack) {
-                      print(e);
-                      print(stack);
-                    }
-                    if (mounted) setState(() {});
-                  },
-                  child: const Text('Verify Account'),
+                    },
+                    child: const Text('Verify Account'),
+                  ),
                 ),
-              ),
             ],
             if (sessionManager.isSignedIn) ...[
               Padding(

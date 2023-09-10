@@ -16,6 +16,15 @@ When you are finished, you can shut down Serverpod with `Ctrl-C`, then stop Post
 
 # Access postgres in docker
 
+### Access through PGAdmin
+
+accessing through pgadmin is easy. get the host and port for postgres image from the docker app.
+the user should be the default user that you use to connect to postgres and the password, you can
+get from the pod_server/config/passwords.yaml.
+go to pg admin create a new server enter the details and then connect to newly created server.
+
+### Access through command line
+
 to connect to postgres database in docker run
 `docker exec -it pod_server-postgres-1 psql -U postgres`
 
@@ -23,9 +32,9 @@ to connect to postgres database in docker run
 `-U` is for the user name of the database you can get these info from `pod_server/config/development.yaml` or `docker-compose.yaml`
 Database password is in docker-compose.yaml file
 
-to work with postgres command line 
+to work with postgres command line
 `\l` lists database
-`\c <db_name>` connects to the database 
+`\c <db_name>` connects to the database
 `\dt` list tables
 `drop database <db_name>;` deletes database (remember to put the `;`)
 `\q` quits postgres terminal

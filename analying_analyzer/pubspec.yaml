@@ -1,10 +1,10 @@
 name: analying_analyzer
-description: Checking out how to read metadata for code generation using analyzer 
+description: Checking out how to read metadata for code generation using analyzer
 version: 1.0.0
 # repository: https://github.com/my_org/my_repo
 
 environment:
-  sdk: '>=3.3.1 <4.0.0'
+  sdk: ">=3.3.1 <4.0.0"
 
 dependencies:
   path: ^1.9.0
@@ -16,11 +16,4 @@ dev_dependencies:
   test: ^1.21.0
   source_gen: ^1.5.0
   build_runner: ^2.4.8
-
-build_runner:
-  # ... (other configurations if any)
-  outputs:
-    generate:
-      - generator: analying_analyzer.generators.GetClassElement
-        output: lib
-  # ... (other configurations if any)
+  package_config: ^2.1.0

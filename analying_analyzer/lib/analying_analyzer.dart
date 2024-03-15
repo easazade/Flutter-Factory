@@ -1,3 +1,5 @@
+import 'package:analying_analyzer/ffd/arg.dart';
+
 abstract class Pet {
   Pet({required this.type, required this.says});
   final String type;
@@ -7,9 +9,11 @@ abstract class Pet {
 }
 
 class Fox extends Pet {
-  Fox({this.canFly}) : super(type: 'Fox', says: 'Roof Roof roof roof rooroof rooroof');
+  Fox({required this.meowObj, this.canFly})
+      : super(type: 'Fox', says: 'Roof Roof roof roof rooroof rooroof');
 
   final bool? canFly;
+  final MeowObj meowObj;
 }
 
 Future<String> method(String? name) async {

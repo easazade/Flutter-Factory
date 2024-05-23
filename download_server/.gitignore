@@ -38,4 +38,6 @@ doc/api/
 # End of https://www.toptal.com/developers/gitignore/api/dart
 
 .vscode/
-.fvm/flutter_sdk
+
+# FVM Version Cache
+.fvm/

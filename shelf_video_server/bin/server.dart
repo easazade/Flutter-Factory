@@ -2,18 +2,29 @@ import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
+import 'package:shelf_plus/shelf_plus.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 // Configure routes.
-final _router = Router()
+final _router = Router().plus
   ..get('/', _rootHandler)
-  ..get('/echo/<message>', _echoHandler);
+  ..get('/echo/<message>', _echoHandler)
+  ..get(
+    '/tutorial/download',
+    () => File('static/tutorial.mp4'),
+    use: download(filename: 'tutorial-video.mp4'),
+  );
 
 Response _rootHandler(Request req) {
   return Response.ok('Hello, World!\n');
 }
 
 Response _echoHandler(Request request) {
+  final message = request.params['message'];
+  return Response.ok('$message\n');
+}
+
+Response _downloadHandler(Request request) {
   final message = request.params['message'];
   return Response.ok('$message\n');
 }

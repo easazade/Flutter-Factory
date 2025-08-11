@@ -277,10 +277,330 @@ This takes precedence over what you define in your library's build.yaml.
 > Which options are applied (dev or release) depends only on whether the app runs build_runner with or without --release.
 
 
+## Defining `PostProcessBuilder`s
+
+`PostProcessBuilder`s are configured similarly to normal `Builder`s, but they
+have some different/missing options.
+
+These builders can not be auto-applied on their own, and must always build to
+cache because their outputs are not declared ahead of time. To apply them a
+user will need to explicitly enable them on a target, or a `Builder` definition
+can add them to `apply_builders`.
+
+Exposed `PostProcessBuilder`s are configured in the `post_process_builders`
+section of the  `build.yaml`. This is a map of builder names to configuration.
+
+A PostProcessBuilder is a special kind of builder in build_runner that runs after all normal builders are done.
+It doesn't create Dart code — it's usually for final cleanup, transformations, or packaging.
+
+Think of it like the "cleanup crew" after the construction workers are done.
+
+Key points
+- Runs after normal code generation is finished.
+- Can read and modify generated outputs from other builders.
+- Cannot read your original source files directly.
+- Commonly used for:
+  - Minifying, compressing, or obfuscating generated assets
+  - Removing temporary files
+  - Bundling generated files into zips
+  - Formatting generated output
+
+
+Each post process builder config may contain the following keys:
+
+- **import**: Required. The import uri that should be used to import the library
+  containing the `Builder` class. This should always be a `package:` uri.
+- **builder_factory**: A `String` which contains the name of the top-level
+  method in the imported library which is a function fitting the
+  typedef `PostProcessBuilder factoryName(BuilderOptions options)`.
+- **input_extensions**: Required. A list of input extensions that will be
+  processed. This must match the `inputExtensions` from the `PostProcessBuilder`
+  returned by the `builder_factory`.
+- **defaults**: Optional: Default values to apply when a user does not specify
+  the corresponding key in their `builders` section. May contain the following
+  keys:
+  - **generate_for**: A list of globs that this Builder should run on as a
+    subset of the corresponding target, or a map with `include` and `exclude`
+    lists of globs.
+
+Example config with a normal `builder` which auto-applies a
+`post_process_builder`:
+
+```yaml
+builders:
+  # The regular builder config, creates `.tar.gz` files.
+  regular_builder:
+    import: "package:my_package/builder.dart"
+    builder_factories: ["myBuilder"]
+    build_extensions: {".dart": [".tar.gz"]}
+    auto_apply: dependents
+    apply_builders: [":archive_extract_builder"]
+post_process_builders:
+  # The post process builder config, extracts `.tar.gz` files.
+  extract_archive_builder:
+    import: "package:my_package/extract_archive_builder.dart"
+    builder_factory: "myExtractArchiveBuilder"
+    input_extensions: [".tar.gz"]
+```
+
+Another example:
+
+```yaml
+post_process_builders:
+  minify_js:
+    import: "package:my_generator/post_builders.dart"
+    builder_factory: "minifyJsBuilder"
+    input_extensions: [".js"]
+    build_extensions: {".js": [".min.js"]}
+    defaults:
+      release_options:
+        enabled: true
+
+```
+
+
+## Adjusting builder order
+
+Normally, build_runner decides the order builders run in.  
+If you need to **force a specific order**, you have two options:
+
+- **`required_inputs`** → "I need to run *after* any builder that creates files with these extensions."  
+  Example: a `.dart` compiler builder sets `required_inputs: [".dart"]` so it runs after all builders that generate Dart files.
+
+- **`runs_before`** → "I must run *before* these specific builders."  
+  Example: if Builder A creates `.json` files that Builder B reads, set `runs_before: [my_package|builder_b]` in Builder A.
+
+⚠ These should be used rarely — don’t create cycles (A → B → A).
+
+---
+
+## **`applies_builders`**
+- Ensures that another builder **always runs on the outputs** of this builder.
+- Not just ordering — it actually applies the other builder to your outputs, even if it normally wouldn’t.
+- Common example:  
+  `SharedPartBuilder` sets:
+
+```yaml
+  applies_builders:
+    - source_gen|combining_builder
+```
+
+
+## Package: source_gen
+**source_gen** sits on top of the low-level **build** APIs and makes writing code generators way easier. It gives you a tiny “generator” abstraction, helpers for reading annotations/types, and ready-made *builders* that wire your generator into `build_runner`.
+
+Here’s the quick tour.
+
+#### What source_gen does (in plain terms)
+- Lets you write a small class that **reads Dart elements** (classes, fields, annotations) and **returns a string of Dart code**.
+- Handles the plumbing so your output lands in either:
+  - a **shared `.g.dart` part** (so multiple generators can contribute to one file), or
+  - a **standalone `*.gen.dart`** (your choice).
+- Provides helpers to **inspect annotations**, **check types**, and **iterate a library’s elements**.
+
+#### Core generator types
+- **`Generator`**  
+  Lowest-level base class. Override `generate(LibraryReader library, BuildStep step)` and emit code for the whole library.
+
+- **`GeneratorForAnnotation<T>`**  
+  Most common. You declare the annotation type `T`, and source_gen calls you **once per annotated element**. Override  
+  `generateForAnnotatedElement(Element element, ConstantReader annotation, BuildStep step)`.
+
+- **`GeneratorForLibrary`**  
+  Like `Generator`, but with a slightly different hook focused on library-level work. Handy when you only want to generate once per library rather than per annotation.
+
+> In practice, 90% of custom generators use **`GeneratorForAnnotation<T>`**.
+
+#### The companion builders (how your generator plugs in)
+These are utilities provided by source_gen that return a `build` **Builder** wrapping your generator:
+
+- **`SharedPartBuilder([...generators], 'name')`**  
+  Writes to `.g.dart` **parts** and coexists with other generators. Must pair with the `source_gen|combining_builder` (usually via `applies_builders`) so partial outputs get merged.
+
+- **`LibraryBuilder(generator, generatedExtension: '.gen.dart')`**  
+  Writes **standalone files**, one per input library. No `part` directive needed.
+
+(There’s also `PartBuilder` for single-generator part files, but most folks just use `SharedPartBuilder`.)
+
+#### Useful helper classes you’ll use a lot
+- **`LibraryReader`** – Wraps an analyzer `LibraryElement` to iterate elements (classes, top-levels) more ergonomically.
+- **`ConstantReader`** – Safely read annotation values (`annotation.peek('name')?.stringValue`, etc.)
+- **`TypeChecker`** – Check types and supertypes without fragile string compares (e.g., `TypeChecker.fromRuntime(Foo).isAssignableFrom(type)`).
+- **`InvalidGenerationSourceError`** – Throw this to give nice, pinpointed errors during generation.
+
+(You'll still use the analyzer types like `Element`, `ClassElement`, `DartType` from `package:analyzer`, and `BuildStep` from `package:build`.)
+
+#### Mini example: an annotation generator
+**annotations package**
+```dart
+// lib/my_annotations.dart
+class AutoToString {
+  const AutoToString();
+}
+```
+
+**generator package**
+```dart
+// lib/src/auto_to_string_generator.dart
+import 'package:source_gen/source_gen.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:dart_style/dart_style.dart';
+import 'package:my_annotations/my_annotations.dart';
+
+class AutoToStringGenerator extends GeneratorForAnnotation<AutoToString> {
+  final _fmt = DartFormatter();
+
+  @override
+  String generateForAnnotatedElement(
+    Element element,
+    ConstantReader annotation,
+    BuildStep step,
+  ) {
+    if (element is! ClassElement) {
+      throw InvalidGenerationSourceError(
+        '@AutoToString can only be used on classes.',
+        element: element,
+      );
+    }
+
+    final cls = element;
+    final fields = cls.fields.where((f) => !f.isStatic).toList();
+
+    final buf = StringBuffer()
+      ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
+      ..writeln('extension ${cls.name}Auto on ${cls.name} {')
+      ..writeln('  @override')
+      ..writeln('  String toString() => "${cls.name}('
+          '${fields.map((f) => '${f.name}: \${this.${f.name}}').join(', ')}'
+          ')";')
+      ..writeln('}');
+
+    return _fmt.format(buf.toString());
+  }
+}
+```
+
+Wire it up with a builder:
+
+```dart
+// lib/builder.dart
+import 'package:build/build.dart';
+import 'package:source_gen/source_gen.dart';
+import 'src/auto_to_string_generator.dart';
+
+Builder autoToStringSharedPart(BuilderOptions _) =>
+    SharedPartBuilder([AutoToStringGenerator()], 'auto_to_string');
+// or
+Builder autoToStringLibrary(BuilderOptions _) =>
+    LibraryBuilder(AutoToStringGenerator(), generatedExtension: '.auto.dart');
+```
+
+**build.yaml (generator package)**
+```yaml
+builders:
+  auto_to_string_shared_part:
+    import: "package:my_generator/builder.dart"
+    builder_factories: ["autoToStringSharedPart"]
+    build_extensions: { ".dart": [".g.dart"] }
+    build_to: source
+    auto_apply: dependents
+    applies_builders:
+      - source_gen|combining_builder
+
+  auto_to_string_library:
+    import: "package:my_generator/builder.dart"
+    builder_factories: ["autoToStringLibrary"]
+    build_extensions: { ".dart": [".auto.dart"] }
+    build_to: source
+    auto_apply: dependents
+```
+
+**consumer app**
+```dart
+import 'package:my_annotations/my_annotations.dart';
+part 'user.g.dart'; // only if using SharedPartBuilder
+
+@AutoToString()
+class User {
+  final String name;
+  final int age;
+  User(this.name, this.age);
+}
+```
+Run:
+```
+dart run build_runner build
+```
+
+#### Typical use cases for source_gen
+- **Serialization / deserialization** (e.g., `json_serializable`)
+- **DI wiring / service locators** (collect annotated classes, generate registries)
+- **Routing / reflection-like metadata** (scan annotations, generate maps/routers)
+- **Immutables / data classes** (`copyWith`, `==`, `hashCode`, `toString`)
+- **i18n / resource bundling** (turn ARB/JSON/YAML into typed Dart APIs)
+- **Schema/code sync** (read external schema assets, emit Dart bindings)
+
+#### How it fits with build_runner
+- You write a `Generator` (your logic).
+- You wrap it in a `SharedPartBuilder` or `LibraryBuilder`.
+- You declare that builder in `build.yaml`.
+- `build_runner` orchestrates: **reads your package code → calls your generator → writes outputs**.
+- If you used `SharedPartBuilder`, the **`source_gen|combining_builder`** merges partial outputs into the final `.g.dart`.
+
+If you tell me what you want to generate (e.g., registries, serializers, riverpod providers, DI), I can sketch a generator skeleton tailored to that use case.
 
 
 
 
+#### Combining Builders (avoid rewriting .g.dart)
 
+The **`combining_builder`** from the `source_gen` package is basically the “merger” for **`SharedPartBuilder`** outputs.  
+
+---
+
+### Why it exists
+When you use `SharedPartBuilder`, **multiple generators** can each write to the same `.g.dart` file for a Dart library.  
+- Instead of each generator overwriting the file, they each create a **partial output** during the build.  
+- The `combining_builder` runs at the end and **combines all those partial outputs** into one `.g.dart` file that matches the `part '...';` in your source file.
+
+---
+
+### Example
+You have one Dart file:
+
+```dart
+part 'user.g.dart';
+
+@MyAnnotation()
+class User {}
+
+@JsonSerializable()
+class Person {}
+```
+
+You run:
+- `my_generator` → writes partial `.g.dart` with extensions for `User`
+- `json_serializable` → writes partial `.g.dart` with `fromJson/toJson` for `Person`
+
+Without `combining_builder`:
+- They’d overwrite each other and you’d lose one of them.
+
+With `combining_builder`:
+- It merges all `.g.part` files into one final `user.g.dart` containing both `User` extensions and `Person` serialization code.
+
+---
+
+### Why `applies_builders` is used with it
+In your builder definition:
+```yaml
+applies_builders:
+  - source_gen|combining_builder
+```
+This ensures that **whenever** your `SharedPartBuilder` writes part outputs, the `combining_builder` will always run afterward to merge them.
+
+---
+
+**TL;DR**:  
+`combining_builder` takes all the “partial” generated files from different `SharedPartBuilder`-based generators and merges them into the single `.g.dart` file that Dart expects for your `part` directive.
 
 

@@ -59,6 +59,52 @@ targets:
 
 ```
 
+#### The dependencies property
+
+the dependencies property inside a targets: section is one of the lesser-known build_runner features.
+Here’s the simple version:
+
+##### What it does
+By default, a target’s builders can only read files inside that target (its own package).
+
+If you add dependencies: to a target, you’re telling build_runner:
+“This target is also allowed to read files from these other targets (other packages).”
+This is read-only access — it lets your builders use outputs or inputs from other packages, but it does not let you modify those packages.
+
+##### Simple example
+Let's say you have:
+
+```graphql
+my_app/
+my_generator/    # contains a builder that needs to read schema files from another package
+shared_schemas/  # contains YAML schema files
+```
+
+Your app (my_app) depends on both my_generator and shared_schemas.
+
+By default, if a builder in my_app tries to read shared_schemas/lib/foo.yaml, build_runner will block it — `not part of this target.`
+
+But if you add:
+
+```yaml
+# my_app/build.yaml
+targets:
+  $default:
+    dependencies:
+      - shared_schemas
+```
+
+Now builders running in my_app are allowed to read files from shared_schemas during the build.
+
+Why it's used
+To aggregate or combine files from other packages (e.g., docs, configs, templates).
+
+To make a builder that merges outputs from multiple packages into one final output in the app.
+
+For multi-package code generation in a mono-repo.
+
+#### auto_apply
+
 Now we should also mention `auto_apply`:
 
 inside the builders section when defining builders there is a field called auto_apply, which defines a general scope for the files this builder should run on when added to an application as library.
@@ -144,4 +190,97 @@ Summary
 
 - The app's \$default target is what build_runner uses when building the app.
 
-#################################################
+## Builders
+
+#### options
+
+Alright — here’s how release options work in build.yaml and how to trigger them.
+
+**1. What release_options is for**
+In a builder definition, you can have different configuration sets depending on the build mode:
+
+```yaml
+builders:
+  my_builder:
+    import: "package:my_generator/builder.dart"
+    builder_factories: ["myBuilder"]
+    build_extensions: { ".dart": [".g.dart"] }
+    build_to: source
+    auto_apply: dependents
+    defaults:
+      options:            # <--- normal dev options
+        minify: false
+    release_options:      # <--- overrides for release builds
+      minify: true
+```
+When you run in release mode, the release_options values override options.
+
+**2. How to trigger a release build**
+The default dart run build_runner build runs in development mode.
+
+To use release_options, you must pass:
+`dart run build_runner build --release`
+
+**3. What happens**
+build_runner sets the build environment to ReleaseBuildOptions.
+Your builder sees options overridden by whatever is inside release_options.
+
+Example: if minify was false in dev but true in release, your generator code will get true when reading the option in release mode.
+
+**4. Common use cases**
+- Turn off expensive debug logging in generated code
+- Enable minification / obfuscation
+- Change generated constants (e.g., API base URLs) for production
+
+5. In your generator code
+You read these values from the BuilderOptions your factory gets:
+
+```dart
+Builder myBuilder(BuilderOptions options) {
+  final minify = options.config['minify'] as bool? ?? false;
+  // Use minify flag in your generator logic...
+}
+```
+
+#### How developers should configure options
+It depends entirely on how they run build_runner in their app.
+
+**1. If they just run:**
+`dart run build_runner build`
+or
+`dart run build_runner watch`
+
+➡ Your builder will use the defaults.options from your build.yaml (the “dev” options).
+These are the same whether it’s the app or your own package running it — this is just the normal development mode.
+
+**2. If they run with --release:**
+`dart run build_runner build --release`
+
+➡ Your builder will use the release_options from your build.yaml.
+Those values override anything in defaults.options.
+
+**3. Can they override these in their own app?**
+Yes — the app can put its own build.yaml with global_options: or targets: to override both dev and release settings for your builder, for example:
+```yaml
+global_options:
+  my_generator|my_builder:
+    options:
+      minify: false
+    release_options:
+      minify: true
+```
+
+This takes precedence over what you define in your library's build.yaml.
+
+> When the app is the root package being built:
+> `auto_apply: dependents` makes your builder run in the app's $default target automatically.
+> Which options are applied (dev or release) depends only on whether the app runs build_runner with or without --release.
+
+
+
+
+
+
+
+
+

@@ -1,1 +1,1 @@
-Checkout [NOTES](/NOTES.md)
+Checkout [NOTES](/code_gen_build_runner/NOTES.md)

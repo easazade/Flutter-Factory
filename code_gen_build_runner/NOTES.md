@@ -598,9 +598,172 @@ applies_builders:
 ```
 This ensures that **whenever** your `SharedPartBuilder` writes part outputs, the `combining_builder` will always run afterward to merge them.
 
----
-
 **TL;DR**:  
 `combining_builder` takes all the “partial” generated files from different `SharedPartBuilder`-based generators and merges them into the single `.g.dart` file that Dart expects for your `part` directive.
 
 
+# Question & Answer
+Let's say I have multiple GenerateForAnnotation implementations and they all run and generate something. now each time one of them runs and generates something I want to generate a metadata about what code they generated and then after they are done generating. I want to run a another Builder after them that uses all that metadata to generate a file with some code. my first question is can i save the metadata in .dart_tool/ and my second question is that is there a better more conventional way to do this?   
+
+Great question — you're thinking about this exactly like a build pipeline.
+
+$ Answered by ChatGPT 5$
+### Short answers
+1) **Can I save the metadata in `.dart_tool/`?**  
+Yes. Set the builder that produces metadata to `build_to: cache`. Its outputs live under `.dart_tool/build/...` and are **not importable**, but any later builder can read them.
+
+2) **Is there a more conventional way?**  
+Yes: use a **two-stage build**:
+- **Stage A (intermediate)**: produce per-library (or per-element) metadata files → **`build_to: cache`**.
+- **Stage B (aggregator)**: read **all** those metadata files and emit your final Dart code → **`build_to: source`**.  
+Wire order with `required_inputs` (and optionally `runs_before`) so B runs after A.
+
+---
+
+## Why not write metadata “inside” a `GeneratorForAnnotation`?
+`source_gen` generators return a **single string** for code. They don’t let you emit arbitrary extra files per run. If you need sidecar files (like JSON metadata), implement a normal **`Builder`** (you can still use `source_gen` helpers like `LibraryReader`, `TypeChecker`, etc.), or have a parallel “metadata” builder that mirrors the selection logic.
+
+---
+
+## Minimal pattern
+
+### A) Intermediate metadata builder (cache)
+Writes one `.my.meta.json` for every input library it inspects.
+
+**builder code (sketch):**
+```dart
+// lib/src/metadata_builder.dart
+import 'dart:convert';
+import 'package:build/build.dart';
+import 'package:source_gen/source_gen.dart'; // for LibraryReader/TypeChecker helpers
+
+class MetadataBuilder implements Builder {
+  @override
+  final buildExtensions = const {
+    '.dart': ['.my.meta.json'],
+  };
+
+  @override
+  Future<void> build(BuildStep step) async {
+    if (!step.inputId.path.startsWith('lib/')) return; // scope to lib
+
+    final lib = await step.resolver.libraryFor(step.inputId);
+    final reader = LibraryReader(lib);
+
+    // Example: collect names of annotated classes
+    final meta = <String, dynamic>{
+      'input': step.inputId.path,
+      'classes': [
+        for (final c in reader.classes)
+          if (c.metadata.isNotEmpty) c.name, // replace with your checks
+      ],
+    };
+
+    final outId = step.inputId.changeExtension('.my.meta.json');
+    await step.writeAsString(outId, const JsonEncoder.withIndent('  ').convert(meta));
+  }
+}
+```
+
+**factory + build.yaml entry:**
+```dart
+// lib/builder.dart
+import 'package:build/build.dart';
+import 'src/metadata_builder.dart';
+
+Builder metadataBuilder(BuilderOptions _) => MetadataBuilder();
+```
+
+```yaml
+# build.yaml in your generator package
+builders:
+  my_metadata_builder:
+    import: "package:my_generator/builder.dart"
+    builder_factories: ["metadataBuilder"]
+    build_extensions: { ".dart": [".my.meta.json"] }
+    build_to: cache
+    auto_apply: dependents
+```
+
+### B) Aggregator builder (source)
+Reads **all** `.my.meta.json` files and generates one (or many) Dart files.
+
+**builder code (sketch):**
+```dart
+// lib/src/aggregate_builder.dart
+import 'dart:convert';
+import 'package:build/build.dart';
+
+class AggregateBuilder implements Builder {
+  @override
+  final buildExtensions = const {
+    r'$package$': ['lib/aggregate_output.g.dart'], // single output for the package
+  };
+
+  @override
+  Future<void> build(BuildStep step) async {
+    // Discover every metadata file in the package
+    final metas = <Map<String, dynamic>>[];
+    await for (final id in step.findAssets(AssetId.glob('${step.inputId.package}/**/*.my.meta.json'))) {
+      final jsonStr = await step.readAsString(id);
+      metas.add(json.decode(jsonStr) as Map<String, dynamic>);
+    }
+
+    // Use metas to produce final Dart
+    final buffer = StringBuffer()
+      ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
+      ..writeln('const generatedIndex = <String, List<String>>{');
+    for (final m in metas) {
+      final input = m['input'] as String;
+      final classes = (m['classes'] as List).cast<String>();
+      buffer.writeln("  '$input': ${classes.map((e) => "'$e'").toList()},");
+    }
+    buffer.writeln('};');
+
+    final out = AssetId(step.inputId.package, 'lib/aggregate_output.g.dart');
+    await step.writeAsString(out, buffer.toString());
+  }
+}
+```
+
+**factory + build.yaml entry (order + wiring):**
+```dart
+// lib/builder.dart
+import 'package:build/build.dart';
+import 'src/aggregate_builder.dart';
+
+Builder aggregateBuilder(BuilderOptions _) => AggregateBuilder();
+```
+
+```yaml
+builders:
+  my_aggregate_builder:
+    import: "package:my_generator/builder.dart"
+    builder_factories: ["aggregateBuilder"]
+    # Special input to produce a single package-level output:
+    build_extensions: { r"$package$": ["lib/aggregate_output.g.dart"] }
+    build_to: source
+    auto_apply: dependents
+    required_inputs: [".my.meta.json"]  # <-- ensures it runs after metadata is ready
+```
+
+> You can also add `runs_before` if another step must happen after aggregation, or add `applies_builders` if you want a follow-up builder to always run on the aggregator’s output.
+
+---
+
+## Variations & notes
+- If you already have multiple `GeneratorForAnnotation`s making code via `SharedPartBuilder`, keep those, **plus** the metadata builder in parallel. The aggregator doesn’t need to parse the generated `.g.dart`; it can read the clean JSON from cache.
+- If you want **one metadata file per element**, you can include the element name in the extension (e.g., write `foo.$ClassName.my.meta.json`). You’ll need to compute target `AssetId`s accordingly.
+- Want to avoid duplicating the selection logic between generators and metadata? Consider **consolidating logic** inside a shared helper (e.g., `lib/src/scan.dart`) that both the generators and the metadata builder call.
+- You could also do this with a **`PostProcessBuilder`** that scans generated outputs, but it’s less conventional than the **intermediate cache → aggregator** pattern, and parsing Dart can be brittle. Prefer structured cache metadata.
+
+---
+
+### TL;DR
+- **Yes**, write metadata to `.dart_tool/build` by setting `build_to: cache`.  
+- The **conventional** approach is a **two-stage pipeline**:  
+  1) **Intermediate builder** writes structured metadata (cache).  
+  2) **Aggregator builder** reads all metadata and emits final Dart (source), with `required_inputs` to ensure order.
+
+
+---

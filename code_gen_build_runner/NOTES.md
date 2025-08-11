@@ -1,4 +1,3 @@
-#################################################
 Inside the build.yaml there are 2 main sections targets and builders
 
 targets are optional if you want to specifically define these builders should run on these directories you can define the targets in your consumer application. It is just for defining these builders need to run on these directories or packages. In short terms you are defining in this package run on these builders on these sources (source files)

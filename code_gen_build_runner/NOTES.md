@@ -30,6 +30,35 @@ targets:
         enabled: true
 ```
 
+Here is a more complex version of a build.yaml file with only targets section create in an application that wants different builders from other libraries to be run on certain files inside the application files 
+
+```yaml
+# build.yaml (in your application package)
+
+targets:
+  $default:
+    # Tell build_runner which files in THIS package are considered inputs.
+    sources:
+      - lib/**
+      - pubspec.yaml
+      - README.md
+
+    builders:
+      # 1) Run Builder A (from the first library) ONLY on pubspec.yaml and README.md
+      first_library_package_name|first_builder_factory_method_name:
+        enabled: true         # keep if that builder didn't set auto_apply
+        generate_for:
+          - pubspec.yaml
+          - README.md
+
+      # 2) Run Builder B (from the second library) on everything inside lib/
+      second_library_package_name|second_builder_factory_method_name:
+        enabled: true         # keep if that builder didn't set auto_apply
+        generate_for:
+          - lib/**
+
+```
+
 Now we should also mention `auto_apply`:
 
 inside the builders section when defining builders there is a field called auto_apply, which defines a general scope for the files this builder should run on when added to an application as library.

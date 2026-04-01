@@ -1,7 +1,13 @@
 import 'package:nocterm/nocterm.dart';
+import 'package:nocterm_test/theme.dart';
 
 void main() {
-  runApp(const Counter());
+  runApp(
+    TuiTheme(
+      data: RosePineTheme.main,
+      child: Counter(),
+    ),
+  );
 }
 
 class Counter extends StatefulComponent {
@@ -17,6 +23,8 @@ class _CounterState extends State<Counter> {
 
   @override
   Component build(BuildContext context) {
+    final theme = TuiTheme.of(context) as RosePineTheme;
+
     return Focusable(
       focused: true,
       onKeyEvent: (event) {
@@ -45,7 +53,7 @@ class _CounterState extends State<Counter> {
       },
       child: Container(
         decoration: BoxDecoration(
-          border: BoxBorder.all(color: Colors.blue),
+          color: theme.background,
         ),
         margin: EdgeInsets.all(8),
         child: Row(
@@ -54,38 +62,44 @@ class _CounterState extends State<Counter> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Counter: $_reverseCount'),
+                Text(
+                  'Counter: $_reverseCount',
+                  style: TextStyle(color: theme.rosePineLove),
+                ),
                 SizedBox(height: 1),
                 Text(
                   'Press ↓ to increment',
-                  style: TextStyle(color: Colors.gray),
+                  style: TextStyle(color: theme.rosePineText),
                 ),
                 Text(
                   'Press ↑ to decrement',
-                  style: TextStyle(color: Colors.gray),
+                  style: TextStyle(color: theme.rosePineText),
                 ),
                 Text(
                   'Press R to reset',
-                  style: TextStyle(color: Colors.gray),
+                  style: TextStyle(color: theme.rosePineText),
                 ),
               ],
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Counter: $_count'),
+                Text(
+                  'Counter: $_count',
+                  style: TextStyle(color: theme.rosePineGold),
+                ),
                 SizedBox(height: 1),
                 Text(
                   'Press ↑ to increment',
-                  style: TextStyle(color: Colors.gray),
+                  style: TextStyle(color: theme.rosePineText),
                 ),
                 Text(
                   'Press ↓ to decrement',
-                  style: TextStyle(color: Colors.gray),
+                  style: TextStyle(color: theme.rosePineText),
                 ),
                 Text(
                   'Press R to reset',
-                  style: TextStyle(color: Colors.gray),
+                  style: TextStyle(color: theme.rosePineText),
                 ),
               ],
             ),

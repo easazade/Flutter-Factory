@@ -1,2 +1,2 @@
-A sample command-line application with an entrypoint in `bin/`, library code
-in `lib/`, and example unit test in `test/`.
+To run the TUI app with hot reload
+Run: `dart --enable-vm-service your_app.dart`

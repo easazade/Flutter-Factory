@@ -1,11 +1,17 @@
 import 'package:nocterm/nocterm.dart';
 import 'package:nocterm_test/components/theme_switcher.dart';
 import 'package:nocterm_test/extensions.dart';
+import 'package:nocterm_test/theme.dart';
 
 void main() {
   runApp(
-    ThemeSwitcher(
-      child: Counter(),
+    NoctermApp(
+      title: 'App',
+      iconName: '😎',
+      theme: RosePineTheme.main,
+      home: ThemeSwitcher(
+        child: Counter(),
+      ),
     ),
   );
 }
@@ -52,7 +58,7 @@ class _CounterState extends State<Counter> {
       child: Container(
         decoration: BoxDecoration(
           color: context.theme.background,
-          title: BorderTitle(text: 'App', alignment: TitleAlignment.center),
+          title: BorderTitle(text: 'Home', alignment: TitleAlignment.center),
           border: BoxBorder.all(color: context.theme.rosePineHighlightHigh),
         ),
         child: Row(

@@ -1,10 +1,10 @@
 import 'package:nocterm/nocterm.dart';
-import 'package:nocterm_test/theme.dart';
+import 'package:nocterm_test/components/theme_switcher.dart';
+import 'package:nocterm_test/extensions.dart';
 
 void main() {
   runApp(
-    TuiTheme(
-      data: RosePineTheme.main,
+    ThemeSwitcher(
       child: Counter(),
     ),
   );
@@ -23,8 +23,6 @@ class _CounterState extends State<Counter> {
 
   @override
   Component build(BuildContext context) {
-    final theme = TuiTheme.of(context) as RosePineTheme;
-
     return Focusable(
       focused: true,
       onKeyEvent: (event) {
@@ -53,9 +51,10 @@ class _CounterState extends State<Counter> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: theme.background,
+          color: context.theme.background,
+          title: BorderTitle(text: 'App', alignment: TitleAlignment.center),
+          border: BoxBorder.all(color: context.theme.rosePineHighlightHigh),
         ),
-        margin: EdgeInsets.all(8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -64,20 +63,20 @@ class _CounterState extends State<Counter> {
               children: [
                 Text(
                   'Counter: $_reverseCount',
-                  style: TextStyle(color: theme.rosePineLove),
+                  style: TextStyle(color: context.theme.rosePineLove),
                 ),
                 SizedBox(height: 1),
                 Text(
                   'Press ↓ to increment',
-                  style: TextStyle(color: theme.rosePineText),
+                  style: TextStyle(color: context.theme.rosePineText),
                 ),
                 Text(
                   'Press ↑ to decrement',
-                  style: TextStyle(color: theme.rosePineText),
+                  style: TextStyle(color: context.theme.rosePineText),
                 ),
                 Text(
                   'Press R to reset',
-                  style: TextStyle(color: theme.rosePineText),
+                  style: TextStyle(color: context.theme.rosePineText),
                 ),
               ],
             ),
@@ -86,20 +85,20 @@ class _CounterState extends State<Counter> {
               children: [
                 Text(
                   'Counter: $_count',
-                  style: TextStyle(color: theme.rosePineGold),
+                  style: TextStyle(color: context.theme.rosePineGold),
                 ),
                 SizedBox(height: 1),
                 Text(
                   'Press ↑ to increment',
-                  style: TextStyle(color: theme.rosePineText),
+                  style: TextStyle(color: context.theme.rosePineText),
                 ),
                 Text(
                   'Press ↓ to decrement',
-                  style: TextStyle(color: theme.rosePineText),
+                  style: TextStyle(color: context.theme.rosePineText),
                 ),
                 Text(
                   'Press R to reset',
-                  style: TextStyle(color: theme.rosePineText),
+                  style: TextStyle(color: context.theme.rosePineText),
                 ),
               ],
             ),

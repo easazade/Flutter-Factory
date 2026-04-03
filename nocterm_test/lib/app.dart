@@ -1,5 +1,5 @@
 import 'package:nocterm/nocterm.dart';
-import 'package:nocterm_test/components/theme_switcher.dart';
+import 'package:nocterm_test/pages/form_page.dart';
 import 'package:nocterm_test/pages/home_page.dart';
 import 'package:nocterm_test/theme.dart';
 
@@ -10,7 +10,11 @@ class MyApp extends StatelessComponent {
       title: 'App',
       iconName: '😎',
       theme: RosePineTheme.main,
-      child: ThemeSwitcher(child: HomePage()),
+      initialRoute: '/home',
+      routes: {
+        '/home': (context) => HomePage(),
+        '/form': (context) => FormPage(),
+      },
     );
   }
 }

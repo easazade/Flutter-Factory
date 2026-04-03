@@ -1,4 +1,5 @@
 import 'package:nocterm/nocterm.dart';
+import 'package:nocterm_test/components/app_shell.dart';
 
 class FormPage extends StatefulComponent {
   @override
@@ -8,6 +9,9 @@ class FormPage extends StatefulComponent {
 class _State extends State<FormPage> {
   @override
   Component build(BuildContext context) {
-    return Center(child: Text('Form Page'));
+    return AppShell(
+      currentRoute: '/form',
+      child: Center(child: Text('Form Page')),
+    );
   }
 }

@@ -1,10 +1,13 @@
 import 'package:nocterm/nocterm.dart';
+import 'package:nocterm_test/components/app_shell.dart';
 import 'package:nocterm_test/components/counter.dart';
 
 class HomePage extends StatelessComponent {
   @override
   Component build(BuildContext context) {
-    return Column(
+    return AppShell(
+      currentRoute: '/home',
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -27,6 +30,7 @@ class HomePage extends StatelessComponent {
         Expanded(child: Counter()),
         Text(asciiArt),
       ],
+    ),
     );
   }
 }

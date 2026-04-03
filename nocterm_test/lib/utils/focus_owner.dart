@@ -3,10 +3,31 @@ import 'package:nocterm_test/utils/focus_manager.dart';
 import 'package:nocterm_test/utils/focus_node.dart';
 
 class FocusOwner extends StatefulComponent {
-  FocusOwner({super.key, required this.builder, required this.onKeyEvent});
+  FocusOwner({
+    super.key,
+    required this.builder,
+    required this.onKeyEvent,
+    this.onEnterPressed,
+    this.onTabPressed,
+    this.onShiftTabPressed,
+    this.onEscapePressed,
+  });
 
   final Component Function(BuildContext context, bool hasFocus) builder;
   final bool Function(KeyboardEvent event) onKeyEvent;
+
+  /// When non-null, replaces the default Enter behavior ([FocusManager.inside]).
+  final void Function()? onEnterPressed;
+
+  /// When non-null, replaces the default Tab behavior ([FocusManager.next]).
+  final void Function()? onTabPressed;
+
+  /// When non-null, replaces the default Shift+Tab behavior
+  /// ([FocusManager.previous]).
+  final void Function()? onShiftTabPressed;
+
+  /// When non-null, replaces the default Escape behavior ([FocusManager.outside]).
+  final void Function()? onEscapePressed;
 
   @override
   State<StatefulComponent> createState() => FocusOwnerState();
@@ -69,23 +90,40 @@ class FocusOwnerState extends State<FocusOwner> {
     return Focusable(
       focused: _hasFocus,
       onKeyEvent: (event) {
-        switch (event) {
-          case LogicalKey.tab:
-            if (event.isShiftPressed) {
-              focusManager.previous();
-            } else {
-              focusManager.next();
+        final key = event.logicalKey;
+        if (key == LogicalKey.tab) {
+          if (event.isShiftPressed) {
+            if (component.onShiftTabPressed != null) {
+              component.onShiftTabPressed!();
+              return true;
             }
-            return true;
-          case LogicalKey.enter:
-            focusManager.inside();
-            return true;
-          case LogicalKey.escape:
-            focusManager.outside();
-            return true;
-          default:
-            return component.onKeyEvent(event);
+            focusManager.previous();
+          } else {
+            if (component.onTabPressed != null) {
+              component.onTabPressed!();
+              return true;
+            }
+            focusManager.next();
+          }
+          return true;
         }
+        if (key == LogicalKey.enter) {
+          if (component.onEnterPressed != null) {
+            component.onEnterPressed!();
+            return true;
+          }
+          focusManager.inside();
+          return true;
+        }
+        if (key == LogicalKey.escape) {
+          if (component.onEscapePressed != null) {
+            component.onEscapePressed!();
+            return true;
+          }
+          focusManager.outside();
+          return true;
+        }
+        return component.onKeyEvent(event);
       },
       child: Builder(
         builder: (context) {

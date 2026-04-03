@@ -3,9 +3,10 @@ import 'package:nocterm_test/utils/focus_manager.dart';
 import 'package:nocterm_test/utils/focus_node.dart';
 
 class FocusOwner extends StatefulComponent {
-  FocusOwner({super.key, required this.builder});
+  FocusOwner({super.key, required this.builder, required this.onKeyEvent});
 
   final Component Function(BuildContext context, bool hasFocus) builder;
+  final bool Function(KeyboardEvent event) onKeyEvent;
 
   @override
   State<StatefulComponent> createState() => FocusOwnerState();
@@ -19,7 +20,10 @@ class FocusOwnerState extends State<FocusOwner> {
 
   static FocusManager get focusManager {
     final m = _focusManager;
-    assert(m != null, 'FocusOwner root must be mounted before using focusManager.');
+    assert(
+      m != null,
+      'FocusOwner root must be mounted before using focusManager.',
+    );
     return m!;
   }
 
@@ -62,10 +66,32 @@ class FocusOwnerState extends State<FocusOwner> {
 
   @override
   Component build(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        return component.builder(context, _hasFocus);
+    return Focusable(
+      focused: _hasFocus,
+      onKeyEvent: (event) {
+        switch (event) {
+          case LogicalKey.tab:
+            if (event.isShiftPressed) {
+              focusManager.previous();
+            } else {
+              focusManager.next();
+            }
+            return true;
+          case LogicalKey.enter:
+            focusManager.inside();
+            return true;
+          case LogicalKey.escape:
+            focusManager.outside();
+            return true;
+          default:
+            return component.onKeyEvent(event);
+        }
       },
+      child: Builder(
+        builder: (context) {
+          return component.builder(context, _hasFocus);
+        },
+      ),
     );
   }
 

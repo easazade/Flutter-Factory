@@ -1,5 +1,6 @@
 import 'package:nocterm/nocterm.dart';
 import 'package:nocterm_test/extensions.dart';
+import 'package:nocterm_test/utils/focus_owner.dart';
 
 class Counter extends StatefulComponent {
   const Counter({super.key});
@@ -14,8 +15,8 @@ class _CounterState extends State<Counter> {
 
   @override
   Component build(BuildContext context) {
-    return Focusable(
-      focused: true,
+    return FocusOwner(
+      name: 'counter',
       onKeyEvent: (event) {
         switch (event.logicalKey) {
           case LogicalKey.arrowUp:
@@ -40,63 +41,72 @@ class _CounterState extends State<Counter> {
             return false;
         }
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: context.theme.background,
-          title: BorderTitle(text: 'Counter', alignment: TitleAlignment.center),
-          border: BoxBorder.all(color: context.theme.rosePineHighlightHigh),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Counter: $_reverseCount',
-                  style: TextStyle(color: context.theme.rosePineLove),
-                ),
-                SizedBox(height: 1),
-                Text(
-                  'Press ↓ to increment',
-                  style: TextStyle(color: context.theme.rosePineText),
-                ),
-                Text(
-                  'Press ↑ to decrement',
-                  style: TextStyle(color: context.theme.rosePineText),
-                ),
-                Text(
-                  'Press R to reset',
-                  style: TextStyle(color: context.theme.rosePineText),
-                ),
-              ],
+      builder: (context, hasFocus) {
+        return Container(
+          decoration: BoxDecoration(
+            color: context.theme.background,
+            title: BorderTitle(
+              text: 'Counter',
+              alignment: TitleAlignment.center,
             ),
-            VerticalDivider(style: DividerStyle.dashed),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Counter: $_count',
-                  style: TextStyle(color: context.theme.rosePineGold),
-                ),
-                SizedBox(height: 1),
-                Text(
-                  'Press ↑ to increment',
-                  style: TextStyle(color: context.theme.rosePineText),
-                ),
-                Text(
-                  'Press ↓ to decrement',
-                  style: TextStyle(color: context.theme.rosePineText),
-                ),
-                Text(
-                  'Press R to reset',
-                  style: TextStyle(color: context.theme.rosePineText),
-                ),
-              ],
+            border: BoxBorder.all(
+              color: hasFocus
+                  ? context.theme.rosePineHighlightHigh
+                  : context.theme.rosePineHighlightLow,
             ),
-          ],
-        ),
-      ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Counter: $_reverseCount',
+                    style: TextStyle(color: context.theme.rosePineLove),
+                  ),
+                  SizedBox(height: 1),
+                  Text(
+                    'Press ↓ to increment',
+                    style: TextStyle(color: context.theme.rosePineText),
+                  ),
+                  Text(
+                    'Press ↑ to decrement',
+                    style: TextStyle(color: context.theme.rosePineText),
+                  ),
+                  Text(
+                    'Press R to reset',
+                    style: TextStyle(color: context.theme.rosePineText),
+                  ),
+                ],
+              ),
+              VerticalDivider(style: DividerStyle.dashed),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Counter: $_count',
+                    style: TextStyle(color: context.theme.rosePineGold),
+                  ),
+                  SizedBox(height: 1),
+                  Text(
+                    'Press ↑ to increment',
+                    style: TextStyle(color: context.theme.rosePineText),
+                  ),
+                  Text(
+                    'Press ↓ to decrement',
+                    style: TextStyle(color: context.theme.rosePineText),
+                  ),
+                  Text(
+                    'Press R to reset',
+                    style: TextStyle(color: context.theme.rosePineText),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

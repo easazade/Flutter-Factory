@@ -2,32 +2,45 @@ import 'dart:math';
 
 class FocusNode {
   final FocusNode? parent;
-  final List<FocusNode> children;
+  final List<FocusNode> _children;
   final String id;
 
-  FocusNode({required this.parent, required this.children, String? id})
-    : id = id ?? newNodeId();
+  /// Optional human-readable label for logging and debugging.
+  final String? name;
 
-  bool get hasChildren => children.isNotEmpty;
+  FocusNode({
+    required this.parent,
+    required List<FocusNode> children,
+    String? id,
+    this.name,
+  }) : id = id ?? newNodeId(),
+       _children = children;
 
-  bool get hasSiblings => (parent?.children.length ?? 0) > 1;
+  Iterable<FocusNode> get children => _children;
 
-  List<FocusNode> get allParentsChildren => parent?.children ?? [];
-
-  void addChild(FocusNode node) {
-    children.add(node);
+  void insertChild(FocusNode node) {
+    _children.add(node);
   }
+
+  /// Resolved label for messages when [name] is null.
+  String get displayLabel => name ?? '(unnamed:$id)';
+
+  bool get hasChildren => _children.isNotEmpty;
+
+  bool get hasSiblings => (parent?._children.length ?? 0) > 1;
+
+  List<FocusNode> get allParentsChildren => parent?._children ?? [];
 
   int get index {
     if (parent == null) {
       return -1;
     } else {
-      return parent!.children.indexOf(this);
+      return parent!._children.indexOf(this);
     }
   }
 
   void removeChild(FocusNode node) {
-    children.removeWhere((e) => e == node);
+    _children.removeWhere((e) => e == node);
   }
 
   @override

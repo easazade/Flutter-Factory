@@ -36,6 +36,7 @@ class SideBar extends StatelessComponent {
     final theme = context.theme;
     final active = currentRoute == route;
     return FocusOwner(
+      name: label,
       onKeyEvent: (_) => false,
       onEnterPressed: () {
         Navigator.of(context).pushReplacementNamed(route);

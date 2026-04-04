@@ -1,3 +1,4 @@
+import 'package:nocterm_test/components/logger.dart';
 import 'package:nocterm_test/utils/focus_node.dart';
 
 typedef FocusObserver = void Function(FocusNode currentFocus);
@@ -23,6 +24,9 @@ class FocusManager {
     for (final observer in List<FocusObserver>.from(observers)) {
       observer(_currentFocus);
     }
+    Logs.instance.add(
+      'current focus: ${currentFocus.name ?? currentFocus.id} | children : ${currentFocus.children.map((e) => e.name).join(',')} | parent: ${currentFocus.parent?.name ?? currentFocus.parent?.id}',
+    );
   }
 
   void next() {
@@ -66,6 +70,11 @@ class FocusManager {
       return;
     }
     _currentFocus = parent;
+    _notifyObservers();
+  }
+
+  void addNode({required FocusNode node, required FocusNode parentNode}) {
+    parentNode.insertChild(node);
     _notifyObservers();
   }
 

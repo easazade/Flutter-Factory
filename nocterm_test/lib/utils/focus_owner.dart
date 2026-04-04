@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:nocterm/nocterm.dart';
 import 'package:nocterm_test/utils/focus_manager.dart';
 import 'package:nocterm_test/utils/focus_node.dart';
@@ -7,11 +9,15 @@ class FocusOwner extends StatefulComponent {
     super.key,
     required this.builder,
     required this.onKeyEvent,
+    this.name,
     this.onEnterPressed,
     this.onTabPressed,
     this.onShiftTabPressed,
     this.onEscapePressed,
   });
+
+  /// Optional label for focus tree logging; forwarded to [FocusNode.name].
+  final String? name;
 
   final Component Function(BuildContext context, bool hasFocus) builder;
   final bool Function(KeyboardEvent event) onKeyEvent;
@@ -62,15 +68,13 @@ class FocusOwnerState extends State<FocusOwner> {
   @override
   void initState() {
     super.initState();
-
+    log('${component.name} initState');
     final ancestorState = context.findAncestorStateOfType<FocusOwnerState>();
     if (ancestorState != null) {
       parentNode = ancestorState.node;
     }
 
-    node = FocusNode(parent: parentNode, children: []);
-
-    parentNode?.addChild(node);
+    node = FocusNode(parent: parentNode, children: [], name: component.name);
 
     if (parentNode == null) {
       assert(
@@ -80,9 +84,12 @@ class FocusOwnerState extends State<FocusOwner> {
       _focusManager = FocusManager(rootNode: node);
     }
 
-    final fm = _focusManager!;
-    _hasFocus = fm.currentFocus == node;
-    fm.addObserver(_onFocusChanged);
+    _hasFocus = focusManager.currentFocus == node;
+    focusManager.addObserver(_onFocusChanged);
+
+    if (parentNode != null) {
+      focusManager.addNode(node: node, parentNode: parentNode!);
+    }
   }
 
   @override
